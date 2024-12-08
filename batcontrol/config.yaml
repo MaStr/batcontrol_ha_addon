@@ -14,7 +14,7 @@ map:
 options:
   timezone: Europe/Berlin #your time zone. not optional.
   loglevel: debug
-  logfile_enabled: true
+  logfile_enabled: false
   max_logfile_size: 100 #kB
   logfile_path: ./batcontrol.log
   battery_control:
