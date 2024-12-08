@@ -58,21 +58,21 @@ options:
     certfile: /etc/ssl/certs/client.crt
     keyfile: /etc/ssl/certs/client.key
     tls_version: tlsv1.2
-# evcc connection
-evcc:
-  enabled: false
-  broker: localhost
-  port: 1883
-  status_topic: evcc/status
-  # one loadpoints that should be monitored
-  loadpoint_topic: evcc/loadpoints/1/charging
-  username: user
-  password: password
-  tls: false
-  cafile: /etc/ssl/certs/ca-certificates.crt
-  certfile: /etc/ssl/certs/client.crt
-  keyfile: /etc/ssl/certs/client.key
-  tls_version: tlsv1.2
+  # evcc connection
+  evcc:
+    enabled: false
+    broker: localhost
+    port: 1883
+    status_topic: evcc/status
+    # one loadpoints that should be monitored
+    loadpoint_topic: evcc/loadpoints/1/charging
+    username: user
+    password: password
+    tls: false
+    cafile: /etc/ssl/certs/ca-certificates.crt
+    certfile: /etc/ssl/certs/client.crt
+    keyfile: /etc/ssl/certs/client.key
+    tls_version: tlsv1.2
 schema:
   timezone: str #your time zone. not optional.
   loglevel: list(debug|info|warning|error)
