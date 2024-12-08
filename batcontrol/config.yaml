@@ -14,7 +14,9 @@ map:
 options:
   timezone: Europe/Berlin #your time zone. not optional.
   loglevel: debug
+  logfile_enabled: true
   max_logfile_size: 100 #kB
+  logfile_path: batcontrol.log
   battery_control:
     min_price_difference: 0.05 # minimum price difference in Euro to justify charging your battery
     always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
@@ -32,6 +34,7 @@ options:
     vat: 0.20 # only required for awattar
     fees: 0.015 # only required for awattar
     markup: 0.03 # only required for awattar
+    url: http://evcc.local:7070/api/tariff/grid # only required for evcc
   pvinstallations:
     - name: Haus #name
       lat: 48.4334480
@@ -55,27 +58,45 @@ options:
     certfile: /etc/ssl/certs/client.crt
     keyfile: /etc/ssl/certs/client.key
     tls_version: tlsv1.2
+# evcc connection
+evcc:
+  enabled: false
+  broker: localhost
+  port: 1883
+  status_topic: evcc/status
+  # one loadpoints that should be monitored
+  loadpoint_topic: evcc/loadpoints/1/charging
+  username: user
+  password: password
+  tls: false
+  cafile: /etc/ssl/certs/ca-certificates.crt
+  certfile: /etc/ssl/certs/client.crt
+  keyfile: /etc/ssl/certs/client.key
+  tls_version: tlsv1.2
 schema:
   timezone: str #your time zone. not optional.
   loglevel: list(debug|info|warning|error)
   max_logfile_size: int
+  logfile_path: str?
+  logfile_enabled: bool?
   battery_control:
     min_price_difference: float(0,) # minimum price difference in Euro to justify charging your battery
     always_allow_discharge_limit: float(0,1) # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: float(0,1) # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
   inverter:
-    type: list(fronius_gen24) #currently only fronius_gen24 supported
+    type: list(fronius_gen24|testdriver) #currently only fronius_gen24 supported
     address: str # the local IP of your inverter. needs to be reachable from the machine that runs batcontrol
     user: list(customer|technician) #customer or technician lowercase only!!
     password: password
     max_pv_charge_rate: float(0,)?
     max_grid_charge_rate: float(0,)?
   utility:
-    type: list(tibber|awattar_at|awattar_de)
+    type: list(tibber|awattar_at|awattar_de|evcc)
     apikey: password? # only required for tibber
     vat: float(0,10)? # only required for awattar
     fees: float(0,10)? # only required for awattar
     markup: float(0,10)? # only required for awattar
+    url: str? # only required for evcc
   pvinstallations:
     - name: str #name
       lat: float(,90)
@@ -95,6 +116,19 @@ schema:
     topic: str
     username: str
     password: password?
+    tls: bool
+    cafile: str?
+    certfile: str?
+    keyfile: str?
+    tls_version: list(tlsv1.2|tlsv1.3)?
+  evcc:
+    enabled: bool
+    broker: str
+    port: int
+    username: str
+    password: password?
+    status_topic: str
+    loadpoint_topic: str
     tls: bool
     cafile: str?
     certfile: str?
