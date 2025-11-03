@@ -1,5 +1,7 @@
 ### Save Electricity cost by re-charging your PV Battery when Electricity is cheap and there is not enough solar energy available.
 
+This repository is a fork of muexxl/ha_addon providing more *experimental* features.
+
 ## Configuration:
 
 See **Documentation**

@@ -1,5 +1,5 @@
-name: "Batcontrol-MaStr"
-description: "Controls the charging of the battery"
+name: "Batcontrol-next"
+description: "Controls the charging of the battery."
 version: "0.5.3"
 slug: "batcontrol"
 init: false
