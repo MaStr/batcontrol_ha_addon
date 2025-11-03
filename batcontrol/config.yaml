@@ -9,7 +9,6 @@ arch:
   - amd64
   - armhf
   - armv7
-  - i386
 map:
   - type: ssl
   - type: addon_config
