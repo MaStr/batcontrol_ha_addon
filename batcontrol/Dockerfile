@@ -1,7 +1,7 @@
 ARG BUILD_FROM
 # Refers to the config.yaml
 ARG BUILD_VERSION
-FROM $BUILD_FROM AS builder
+FROM python:3.11-alpine AS builder
 
 # Install build dependencies
 RUN apk add --no-cache \
