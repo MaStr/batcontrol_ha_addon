@@ -3,7 +3,7 @@ description: "Controls the charging of the battery"
 version: "0.5.3"
 slug: "batcontrol"
 init: false
-image: "ghcr.io/mastr/batcontrol_ha_addon/{arch}-batcontrol"
+image: "ghcr.io/mastr/batcontrol_ha_addon:latest"
 arch:
   - aarch64
   - amd64
