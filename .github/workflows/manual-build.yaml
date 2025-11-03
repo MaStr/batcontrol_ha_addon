@@ -26,12 +26,10 @@ jobs:
           declare -a changed_addons
           changed_addons=("\"${addon}\",");
 
-          changed=$(echo ${changed_addons[@]} | rev | cut -c 2- | rev)
-
-          if [[ -n ${changed} ]]; then
-            echo "Changed add-ons: $changed";
+          if [[ -n "${changed_addons}" ]]; then
+            echo "Changed add-ons: ${changed_addons[*]}";
             echo "changed=true" >> $GITHUB_OUTPUT;
-            echo "addons=[$changed]" >> $GITHUB_OUTPUT;
+            echo "addons=[\"${{ github.event.inputs.addon }}\"]" >> $GITHUB_OUTPUT;
           else
             echo "No add-on had any monitored files changed (${{ env.MONITORED_FILES }})";
           fi
