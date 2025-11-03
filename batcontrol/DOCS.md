@@ -54,7 +54,7 @@ False # enable earlier charging based on a more relaxed calculation # future_pri
 
 ### `utility`:
 
-`type`: your electricity provider. Currently supported: `tibber`, `awattar_at`, `awattar_de`
+`type`: your electricity provider. Currently supported: `tibber`, `awattar_at`, `awattar_de`, `evcc`
 `apikey`: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber , ignored for awattar
 `vat`: 0.20 # only required for awattar, ignored for tibber
 `fees`: 0.015 # only required for awattar, ignored for tibber
