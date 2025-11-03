@@ -26,6 +26,9 @@ FROM $BUILD_FROM
 # Refers to the config.yaml
 ARG BUILD_VERSION
 LABEL VERSION="${BUILD_VERSION}"
+LABEL org.opencontainers.image.source = "https://github.com/MaStr/batcontrol_ha_addon"
+LABEL org.opencontainers.image.description="Alternate batcontrol add-on for Home Assistant"
+LABEL org.opencontainers.image.licenses=MIT
 
 # Copy the built wheel from the builder stage and install it
 COPY --from=builder /wheels /wheels
