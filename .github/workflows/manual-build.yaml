@@ -10,7 +10,7 @@ on:
       addon:
         description: "The add-on to build"
         required: true
-        default: "."
+        default: "batcontrol"
 
 jobs:
   init:
@@ -20,17 +20,6 @@ jobs:
       changed_addons: ${{ steps.changed_addons.outputs.addons }}
       changed: ${{ steps.changed_addons.outputs.changed }}
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v5.0.0
-
-      - name: Get changed files
-        id: changed_files
-        uses: jitterbit/get-changed-files@v1
-
-      - name: Find add-on directories
-        id: addons
-        uses: home-assistant/actions/helpers/find-addons@master
-
       - name: Get changed add-ons
         id: changed_addons
         run: |
