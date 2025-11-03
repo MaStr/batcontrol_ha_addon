@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "latest"
+version: "0.5.4dev"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -36,7 +36,7 @@ options:
     soften_price_difference_on_charging_factor: 5
     round_price_digits: 4 # round price to n digits after the comma
   inverter:
-    type: fronius_gen24 #currently only fronius_gen24 supported
+    type: dummy #currently only fronius_gen24 supported
     address: 192.168.0.XX # the local IP of your inverter. needs to be reachable from the machine that runs batcontrol
     user: customer #customer or technician lowercase only!!
     password: YOUR-PASSWORD #
@@ -115,16 +115,15 @@ schema:
     soften_price_difference_on_charging_factor: int
     round_price_digits: int # round price to n digits after the comma
   inverter:
-    # with 0.5.4 type: list(fronius_gen24|mqtt|dummy)
-    type: list(fronius_gen24|dummy)
+    type: list(fronius_gen24|dummy|mqtt)
     address: str? # the local IP of your inverter. Required for fronius_gen24
     user: list(customer|technician)? # Required for fronius_gen24
     password: password?
-    # 0.5.4 capacity: int(0,)? # Battery capacity in Wh, required for mqtt
-    # 0.5.4 min_soc: int(0,100)? # Minimum SoC %, optional for mqtt (default: 5)
-    # 0.5.4 max_soc: int(0,100)? # Maximum SoC %, optional for mqtt (default: 100)
-    # 0.5.4 cache_ttl: int(0,)? # Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
-    # 0.5.4 base_topic: str? # MQTT base topic, optional for mqtt (default: 'default')
+    capacity: int(0,)? # (MQTT)  Battery capacity in Wh, required for mqtt
+    min_soc: int(0,100)? # (MQTT) Minimum SoC %, optional for mqtt (default: 5)
+    max_soc: int(0,100)? # (MQTT)  Maximum SoC %, optional for mqtt (default: 100)
+    cache_ttl: int(0,)? # (MQTT)  Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
+    base_topic: str? #  (MQTT)  base topic, optional for mqtt (default: 'default')
     max_pv_charge_rate: float(0,)?  # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
   utility:
