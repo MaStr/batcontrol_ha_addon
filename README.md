@@ -9,7 +9,8 @@
 
 This repository contains only one add-on
 To use this addon you need a Fronius Inverter with a battery AND a dynamic priced electricity contract from differet sources.
-You find more under:  [batcontrol wiki](https://github.com/muexxl/batcontrol/wiki/Dynamic-tariff-provider)
+
+You find more under:  [batcontrol wiki](https://github.com/muexxl/batcontrol/wiki)
 
 
 ### [Batcontrol add-on]
@@ -18,7 +19,6 @@ You find more under:  [batcontrol wiki](https://github.com/muexxl/batcontrol/wik
 ![Supports amd64 Architecture][amd64-shield]
 ![Supports armhf Architecture][armhf-shield]
 ![Supports armv7 Architecture][armv7-shield]
-![Supports i386 Architecture][i386-shield]
 
 
 <!--
@@ -44,4 +44,4 @@ Notes to developers after forking or using the github template feature:
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg
 [armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
-[i386-shield]: https://img.shields.io/badge/i386-yes-green.svg
+
