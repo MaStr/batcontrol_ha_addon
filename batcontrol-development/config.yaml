@@ -3,6 +3,7 @@ description: "(development) Controls the charging of the battery."
 version: "0.5.4dev"
 slug: "batcontrol-development"
 init: false
+build_arg: "--no-cache"
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
 arch:
   - aarch64
