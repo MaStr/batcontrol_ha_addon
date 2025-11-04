@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.5.4dev"
+version: "0.5.4dev1"
 slug: "batcontrol-development"
 init: false
 build_arg: "--no-cache"
