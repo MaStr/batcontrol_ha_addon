@@ -156,7 +156,7 @@ schema:
       token: str? #solarprognose
       horizon: str? #forecastsolarapi horizon modifier
   consumption_forecast:
-    type: list(csv|homeassistant_api)
+    type: list(csv|homeassistant-api)
     annual_consumption: float(0,)? # CSV - total consumption in kWh p.a. the load profile
     load_profile: str # CSV - name of the load profile file within the config folder
     base_url: str? # HA - Websocket URL
