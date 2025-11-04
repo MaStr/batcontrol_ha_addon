@@ -169,9 +169,9 @@ schema:
     apitoken: str? # HA - Long Lived Access Token
     entity_id: str? # HA - Entity ID with consumption data (in Wh)
     history_days:
-       - str     # HA - which days to look back for historical data
+       - int?     # HA - which days to look back for historical data
     history_weights: 
-       - str         # HA - weight for each history period (1-10), higher = more influence
+       - int?         # HA - weight for each history period (1-10), higher = more influence
     cache_ttl_hours: float(0,)? # HA - how long to cache computed statistics (hours)
     multiplier: float(0,)? # HA - multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
