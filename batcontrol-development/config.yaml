@@ -65,19 +65,8 @@ options:
     base_url: ws://homeassistant:8123  # Your HomeAssistant URL
     apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN  # Get from HomeAssistant Profile
     entity_id: sensor.energy_consumption  # Entity ID with consumption data (in Wh or kWh)
-<<<<<<< HEAD
-    history_days:
-          -  "-7"
-          - "-14"
-          - "-21"   # Days to look back for historical data
-    history_weights:
-          - "1"
-          - "1"
-          - "1"   # Weight for each history period (1-10), higher = more influence
-=======
     history_days: "-7;-14;-21"  # Days to look back for historical data
     history_weights: "1;1;1"  # Weight for each history period (1-10), higher = more influence
->>>>>>> 588e66a (development: Change weight,day list to ; separated string)
     cache_ttl_hours: 48.0  # How long to cache computed statistics (hours)
     multiplier: 1.0  # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
@@ -173,15 +162,8 @@ schema:
     base_url: str? # HA - Websocket URL
     apitoken: str? # HA - Long Lived Access Token
     entity_id: str? # HA - Entity ID with consumption data (in Wh)
-<<<<<<< HEAD
-    history_days:
-       - str?     # HA - which days to look back for historical data
-    history_weights: 
-       - str?         # HA - weight for each history period (1-10), higher = more influence
-=======
     history_days: str? # HA - which days to look back for historical data
     history_weights: str? # HA - weight for each history period (1-10), higher = more influence
->>>>>>> 588e66a (development: Change weight,day list to ; separated string)
     cache_ttl_hours: float(0,)? # HA - how long to cache computed statistics (hours)
     multiplier: float(0,)? # HA - multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
