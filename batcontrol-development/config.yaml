@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.5.4dev1"
+version: "0.5.4dev2"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -43,10 +43,10 @@ options:
     max_pv_charge_rate: 0 # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: 5000 # Watt
   utility:
-    type: tibber
+    type: awattar_de #tibber, awattar_at, awattar_de, evcc
     apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber
     url: http://evcc.local:7070/api/tariff/grid # only required for evcc
-    vat: 0.20 # only required for awattar
+    vat: 0.19 # only required for awattar
     fees: 0.015 # only required for awattar
     markup: 0.03 # only required for awattar
   solar_forecast_provider: fcsolarapi
@@ -65,6 +65,7 @@ options:
     base_url: ws://homeassistant:8123  # Your HomeAssistant URL
     apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN  # Get from HomeAssistant Profile
     entity_id: sensor.energy_consumption  # Entity ID with consumption data (in Wh or kWh)
+<<<<<<< HEAD
     history_days:
           -  "-7"
           - "-14"
@@ -73,6 +74,10 @@ options:
           - "1"
           - "1"
           - "1"   # Weight for each history period (1-10), higher = more influence
+=======
+    history_days: "-7;-14;-21"  # Days to look back for historical data
+    history_weights: "1;1;1"  # Weight for each history period (1-10), higher = more influence
+>>>>>>> 588e66a (development: Change weight,day list to ; separated string)
     cache_ttl_hours: 48.0  # How long to cache computed statistics (hours)
     multiplier: 1.0  # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
@@ -168,10 +173,15 @@ schema:
     base_url: str? # HA - Websocket URL
     apitoken: str? # HA - Long Lived Access Token
     entity_id: str? # HA - Entity ID with consumption data (in Wh)
+<<<<<<< HEAD
     history_days:
        - str?     # HA - which days to look back for historical data
     history_weights: 
        - str?         # HA - weight for each history period (1-10), higher = more influence
+=======
+    history_days: str? # HA - which days to look back for historical data
+    history_weights: str? # HA - weight for each history period (1-10), higher = more influence
+>>>>>>> 588e66a (development: Change weight,day list to ; separated string)
     cache_ttl_hours: float(0,)? # HA - how long to cache computed statistics (hours)
     multiplier: float(0,)? # HA - multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
