@@ -1,6 +1,6 @@
 name: "Batcontrol-next"
 description: "Controls the charging of the battery."
-version: "0.5.3"
+version: "0.5.4"
 slug: "batcontrol"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -36,17 +36,17 @@ options:
     soften_price_difference_on_charging_factor: 5
     round_price_digits: 4 # round price to n digits after the comma
   inverter:
-    type: fronius_gen24 #currently only fronius_gen24 supported
+    type: dummy #currently only fronius_gen24 supported
     address: 192.168.0.XX # the local IP of your inverter. needs to be reachable from the machine that runs batcontrol
     user: customer #customer or technician lowercase only!!
     password: YOUR-PASSWORD #
     max_pv_charge_rate: 0 # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: 5000 # Watt
   utility:
-    type: tibber
+    type: awattar_de #tibber, awattar_at, awattar_de, evcc
     apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber
     url: http://evcc.local:7070/api/tariff/grid # only required for evcc
-    vat: 0.20 # only required for awattar
+    vat: 0.19 # only required for awattar
     fees: 0.015 # only required for awattar
     markup: 0.03 # only required for awattar
   solar_forecast_provider: fcsolarapi
@@ -59,8 +59,16 @@ options:
       kWp: 15.695 # power in kWp
       url: http://evcc.local:7070/api/tariff/solar # only required for evcc-solar
   consumption_forecast:
+    type: csv
     annual_consumption: 4500 # total consumption in kWh p.a. the load profile
     load_profile: load_profile.csv #name of the load profile file within the config folder
+    base_url: ws://homeassistant:8123  # Your HomeAssistant URL
+    apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN  # Get from HomeAssistant Profile
+    entity_id: sensor.energy_consumption  # Entity ID with consumption data (in Wh or kWh)
+    history_days: "-7;-14;-21"  # Days to look back for historical data
+    history_weights: "1;1;1"  # Weight for each history period (1-10), higher = more influence
+    cache_ttl_hours: 48.0  # How long to cache computed statistics (hours)
+    multiplier: 1.0  # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
     enabled: false
     logger: false
@@ -115,16 +123,15 @@ schema:
     soften_price_difference_on_charging_factor: int
     round_price_digits: int # round price to n digits after the comma
   inverter:
-    # with 0.5.4 type: list(fronius_gen24|mqtt|dummy)
-    type: list(fronius_gen24|dummy)
+    type: list(fronius_gen24|dummy|mqtt)
     address: str? # the local IP of your inverter. Required for fronius_gen24
     user: list(customer|technician)? # Required for fronius_gen24
     password: password?
-    # 0.5.4 capacity: int(0,)? # Battery capacity in Wh, required for mqtt
-    # 0.5.4 min_soc: int(0,100)? # Minimum SoC %, optional for mqtt (default: 5)
-    # 0.5.4 max_soc: int(0,100)? # Maximum SoC %, optional for mqtt (default: 100)
-    # 0.5.4 cache_ttl: int(0,)? # Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
-    # 0.5.4 base_topic: str? # MQTT base topic, optional for mqtt (default: 'default')
+    capacity: int(0,)? # (MQTT)  Battery capacity in Wh, required for mqtt
+    min_soc: int(0,100)? # (MQTT) Minimum SoC %, optional for mqtt (default: 5)
+    max_soc: int(0,100)? # (MQTT)  Maximum SoC %, optional for mqtt (default: 100)
+    cache_ttl: int(0,)? # (MQTT)  Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
+    base_topic: str? #  (MQTT)  base topic, optional for mqtt (default: 'default')
     max_pv_charge_rate: float(0,)?  # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
   utility:
@@ -149,8 +156,16 @@ schema:
       token: str? #solarprognose
       horizon: str? #forecastsolarapi horizon modifier
   consumption_forecast:
-    annual_consumption: float(0,)? # total consumption in kWh p.a. the load profile
-    load_profile: str #name of the load profile file within the config folder
+    type: list(csv|homeassistant-api)
+    annual_consumption: float(0,)? # CSV - total consumption in kWh p.a. the load profile
+    load_profile: str # CSV - name of the load profile file within the config folder
+    base_url: str? # HA - Websocket URL
+    apitoken: str? # HA - Long Lived Access Token
+    entity_id: str? # HA - Entity ID with consumption data (in Wh)
+    history_days: str? # HA - which days to look back for historical data
+    history_weights: str? # HA - weight for each history period (1-10), higher = more influence
+    cache_ttl_hours: float(0,)? # HA - how long to cache computed statistics (hours)
+    multiplier: float(0,)? # HA - multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
     enabled: bool
     logger: bool
