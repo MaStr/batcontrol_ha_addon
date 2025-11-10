@@ -1,3 +1,25 @@
+# 🚀 Release 0.5.4 - published on 12.11.2025
+
+### What's Changed
+* Overwork provider management by @MaStr in https://github.com/muexxl/batcontrol/pull/213
+* (beta) Add generic MQTT inverter driver & restructure mqtt handling & homeassistant discovery by @Copilot in https://github.com/muexxl/batcontrol/pull/196
+*  Homeassistant sensor as consumption forecast by @MaStr & @greteOne in https://github.com/muexxl/batcontrol/pull/214
+* HA consumption input conversion by @MaStr in https://github.com/muexxl/batcontrol/pull/221
+* Ha addon reduce logging by @MaStr in https://github.com/muexxl/batcontrol/pull/222
+* Asynchroneaus forecast fetcher via schedule() by @MaStr in https://github.com/muexxl/batcontrol/pull/223
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.3...0.5.4
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.5.4](https://github.com/muexxl/batcontrol/releases/tag/0.5.4)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
 # 🚀 Version 0.5.3 — published on 17.10.2025
 
 ### What's New
