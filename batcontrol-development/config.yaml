@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.5.4dev2"
+version: "0.5.5dev"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -135,12 +135,12 @@ schema:
     max_pv_charge_rate: float(0,)?  # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
   utility:
-    type: list(tibber|awattar_at|awattar_de|evcc)
-    apikey: password? # only required for tibber
+    type: list(tibber|awattar_at|awattar_de|evcc|energyforecast)
+    apikey: password? # only required for tibber & energyforecast
     url: str? # only required for evcc
-    vat: float(0,10)? # only required for awattar
-    fees: float(0,10)? # only required for awattar
-    markup: float(0,10)? # only required for awattar
+    vat: float(0,10)? # only required for awattar and energyforecast
+    fees: float(0,10)? # only required for awattar and energyforecast
+    markup: float(0,10)? # only required for awattar and energyforecast
   solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar)?
   pvinstallations:
     - name: str #name
