@@ -1,3 +1,26 @@
+
+# 🚀 Release 0.5.5 - published on 16.11.2025
+
+## What's Changed
+* Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
+* Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
+* Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228  Thanks for reporting & testing @magicofit 
+* energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.4...0.5.5
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.5.5](https://github.com/muexxl/batcontrol/releases/tag/0.5.5)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
+
+
 # 🚀 Release 0.5.4 - published on 12.11.2025
 
 ### What's Changed
