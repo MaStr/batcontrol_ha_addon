@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.5.6dev"
+version: "0.5.6dev1"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
