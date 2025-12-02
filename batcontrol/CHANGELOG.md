@@ -1,3 +1,48 @@
+
+# 🚀 Release 0.5.5 - published on 16.11.2025
+
+## What's Changed
+* Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
+* Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
+* Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228  Thanks for reporting & testing @magicofit 
+* energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.4...0.5.5
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.5.5](https://github.com/muexxl/batcontrol/releases/tag/0.5.5)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
+
+
+# 🚀 Release 0.5.4 - published on 12.11.2025
+
+### What's Changed
+* Overwork provider management by @MaStr in https://github.com/muexxl/batcontrol/pull/213
+* (beta) Add generic MQTT inverter driver & restructure mqtt handling & homeassistant discovery by @Copilot in https://github.com/muexxl/batcontrol/pull/196
+*  Homeassistant sensor as consumption forecast by @MaStr & @greteOne in https://github.com/muexxl/batcontrol/pull/214
+* HA consumption input conversion by @MaStr in https://github.com/muexxl/batcontrol/pull/221
+* Ha addon reduce logging by @MaStr in https://github.com/muexxl/batcontrol/pull/222
+* Asynchroneaus forecast fetcher via schedule() by @MaStr in https://github.com/muexxl/batcontrol/pull/223
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.3...0.5.4
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.5.4](https://github.com/muexxl/batcontrol/releases/tag/0.5.4)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
 # 🚀 Version 0.5.3 — published on 17.10.2025
 
 ### What's New

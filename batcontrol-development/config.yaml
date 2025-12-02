@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.5.4dev2"
+version: "0.5.6dev2"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -45,10 +45,10 @@ options:
     fronius_inverter_id: '1' # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: '0' # Optional: ID of the controller in Fronius API (default: '0')
   utility:
-    type: tibber
+    type: awattar_de #tibber, awattar_at, awattar_de, evcc
     apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber
     url: http://evcc.local:7070/api/tariff/grid # only required for evcc
-    vat: 0.20 # only required for awattar
+    vat: 0.19 # only required for awattar
     fees: 0.015 # only required for awattar
     markup: 0.03 # only required for awattar
   solar_forecast_provider: fcsolarapi
@@ -67,14 +67,8 @@ options:
     base_url: ws://homeassistant:8123  # Your HomeAssistant URL
     apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN  # Get from HomeAssistant Profile
     entity_id: sensor.energy_consumption  # Entity ID with consumption data (in Wh or kWh)
-    history_days:
-          -  "-7"
-          - "-14"
-          - "-21"   # Days to look back for historical data
-    history_weights:
-          - "1"
-          - "1"
-          - "1"   # Weight for each history period (1-10), higher = more influence
+    history_days: "-7;-14;-21"  # Days to look back for historical data
+    history_weights: "1;1;1"  # Weight for each history period (1-10), higher = more influence
     cache_ttl_hours: 48.0  # How long to cache computed statistics (hours)
     multiplier: 1.0  # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
@@ -145,12 +139,12 @@ schema:
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
   utility:
-    type: list(tibber|awattar_at|awattar_de|evcc)
-    apikey: password? # only required for tibber
+    type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_96)
+    apikey: password? # only required for tibber & energyforecast
     url: str? # only required for evcc
-    vat: float(0,10)? # only required for awattar
-    fees: float(0,10)? # only required for awattar
-    markup: float(0,10)? # only required for awattar
+    vat: float(0,10)? # only required for awattar and energyforecast
+    fees: float(0,10)? # only required for awattar and energyforecast
+    markup: float(0,10)? # only required for awattar and energyforecast
   solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar)?
   pvinstallations:
     - name: str #name
@@ -172,10 +166,8 @@ schema:
     base_url: str? # HA - Websocket URL
     apitoken: str? # HA - Long Lived Access Token
     entity_id: str? # HA - Entity ID with consumption data (in Wh)
-    history_days:
-       - str?     # HA - which days to look back for historical data
-    history_weights: 
-       - str?         # HA - weight for each history period (1-10), higher = more influence
+    history_days: str? # HA - which days to look back for historical data
+    history_weights: str? # HA - weight for each history period (1-10), higher = more influence
     cache_ttl_hours: float(0,)? # HA - how long to cache computed statistics (hours)
     multiplier: float(0,)? # HA - multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
   mqtt:
