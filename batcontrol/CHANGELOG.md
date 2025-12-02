@@ -1,3 +1,22 @@
+# 🚀 Release 0.5.6 - published on 04.12.2025
+
+## What's Changed
+* Fix HomeAssistant forecast cache validation to check specific future hours by @Copilot in https://github.com/muexxl/batcontrol/pull/232
+* Fix cache offset bug in HomeAssistant consumption forecast for non-contiguous missing hours by @Copilot in https://github.com/muexxl/batcontrol/pull/235
+* Make Fronius inverter and controller IDs configurable by @Copilot in https://github.com/muexxl/batcontrol/pull/239
+
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.5...0.5.6
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.5.6](https://github.com/muexxl/batcontrol/releases/tag/0.5.6)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
 
 # 🚀 Release 0.5.5 - published on 16.11.2025
 
