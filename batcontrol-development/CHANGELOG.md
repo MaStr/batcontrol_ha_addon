@@ -1,10 +1,30 @@
-# 🚀 Version 0.5.4 - in development
+# 🚀 Release 0.5.6 - in development
+
+## What's Changed
+* HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
+* HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
+
+# 🚀 Release 0.5.6 - published on 04.12.2025
+
+## What's Changed
+* Fix HomeAssistant forecast cache validation to check specific future hours by @Copilot in https://github.com/muexxl/batcontrol/pull/232
+* Fix cache offset bug in HomeAssistant consumption forecast for non-contiguous missing hours by @Copilot in https://github.com/muexxl/batcontrol/pull/235
+* Make Fronius inverter and controller IDs configurable by @Copilot in https://github.com/muexxl/batcontrol/pull/239
+
+# 🚀 Release 0.5.5 - published on 16.11.2025
+
+## What's Changed
+* Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
+* Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
+* Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228  Thanks for reporting & testing @magicofit 
+* energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
+
+# 🚀 Release 0.5.4 - published on 12.11.2025
 
 - Harmonized way of caching for tarif and solar.
 - (beta) HomeAssistant source for consumption forecast
 - (beta) generic MQTT inverter
 - Refactoring HA discovery
-
 
 # 🚀 Version 0.5.3 — published on 17.10.2025
 
