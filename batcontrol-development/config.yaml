@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.5.7dev"
+version: "0.5.7dev1"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -71,6 +71,7 @@ options:
     history_weights: "1;1;1"  # Weight for each history period (1-10), higher = more influence
     cache_ttl_hours: 48.0  # How long to cache computed statistics (hours)
     multiplier: 1.0  # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
+    sensor_unit: auto # Discover or set sensor unit
   mqtt:
     enabled: false
     logger: false
@@ -170,6 +171,7 @@ schema:
     history_weights: str? # HA - weight for each history period (1-10), higher = more influence
     cache_ttl_hours: float(0,)? # HA - how long to cache computed statistics (hours)
     multiplier: float(0,)? # HA - multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
+    sensor_unit: list(auto|Wh|kWh) # HA - Which unit is configured in the sensor
   mqtt:
     enabled: bool
     logger: bool
