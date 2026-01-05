@@ -1,3 +1,21 @@
+# 🚀 Release 0.5.7 - published on 05.01.2026
+
+## What's Changed
+* HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
+* HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.6...0.5.7
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.5.7](https://github.com/muexxl/batcontrol/releases/tag/0.5.7)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
 # 🚀 Release 0.5.6 - published on 04.12.2025
 
 ## What's Changed

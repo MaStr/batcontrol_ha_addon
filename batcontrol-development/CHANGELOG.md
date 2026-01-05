@@ -1,4 +1,4 @@
-# 🚀 Release 0.5.6 - in development
+# 🚀 Release 0.5.6 - published on 05.01.2026
 
 ## What's Changed
 * HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
