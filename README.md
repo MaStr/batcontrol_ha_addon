@@ -8,10 +8,17 @@
 **This repository is a fork of muexx/ha_addon , with additional adjustements**
 
 This repository contains only one add-on
-To use this addon you need a Fronius Inverter with a battery AND a dynamic priced electricity contract from differet sources.
+To use this addon you need primarily Fronius Inverter with a battery AND a dynamic priced electricity contract from differet sources.
+Alternatives are MQTT based inverter interface for your own implementations.
+
+batcontrol connects to evcc, if you like to.
 
 You find more under:  [batcontrol wiki](https://github.com/muexxl/batcontrol/wiki)
 
+## Support my work
+
+- You can support my work using [Github Sponsoring](https://github.com/sponsors/MaStr).
+- Other ways are invoiced (VAT) based via office(a)bisquitbox.de
 
 ### [Batcontrol add-on]
 
