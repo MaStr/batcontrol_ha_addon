@@ -15,3 +15,8 @@ This software has not been tested on many devices and should be considered exper
 
 For further details, ongoing discussions, bugs and features you may check the main repository of batcontrol.
 https://github.com/muexxl/batcontrol
+
+## Support my work
+
+- You can support my work using [Github Sponsoring](https://github.com/sponsors/MaStr).
+- Other ways are invoiced (VAT) based via office(a)bisquitbox.de
