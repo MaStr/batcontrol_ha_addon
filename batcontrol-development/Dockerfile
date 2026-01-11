@@ -56,6 +56,8 @@ RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --p
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
 ENV BATCONTROL_GIT_SHA=${GIT_SHA}
+ENV BATCONTROL_RUNTIME_ENV="home_assistant_addon-ng"
+
 # Set default timezone to UTC, override with -e TZ=Europe/Berlin or similar
 # when starting the container
 # or set the timezone in docker-compose.yml in the environment section,
