@@ -19,4 +19,4 @@ https://github.com/muexxl/batcontrol
 ## Support my work
 
 - You can support my work using [Github Sponsoring](https://github.com/sponsors/MaStr).
-- Other ways are invoiced (VAT) based via office(a)bisquitbox.de
+- Other ways are invoiced (VAT) based via batcontrol(a)bisquitbox.de
