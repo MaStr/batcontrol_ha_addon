@@ -7,7 +7,7 @@ Default time resolution is 60 minutes.
 - Introducing the 15-minute calculation slots with dynamic up/downsample
 - Configuration for 15 or 60 minutes
 - Expected Consumption Wh per hour is now distributed evenly across the 4 slots.
-- PV is scaled linear between the adjecent hours.
+- PV is scaled linear between the adjacent hours.
 
 **Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.7...0.6.0
 
