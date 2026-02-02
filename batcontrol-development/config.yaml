@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.6.0dev2"
+version: "0.6.1dev"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -43,8 +43,8 @@ options:
     password: YOUR-PASSWORD #
     max_pv_charge_rate: 0 # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: 5000 # Watt
-    fronius_inverter_id: '1' # Optional: ID of the inverter in Fronius API (default: '1')
-    fronius_controller_id: '0' # Optional: ID of the controller in Fronius API (default: '0')
+    fronius_inverter_id: "1" # Optional: ID of the inverter in Fronius API (default: '1')
+    fronius_controller_id: "0" # Optional: ID of the controller in Fronius API (default: '0')
   utility:
     type: awattar_de #tibber, awattar_at, awattar_de, evcc
     apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber
@@ -65,13 +65,13 @@ options:
     type: csv
     annual_consumption: 4500 # total consumption in kWh p.a. the load profile
     load_profile: load_profile.csv #name of the load profile file within the config folder
-    base_url: ws://homeassistant:8123  # Your HomeAssistant URL
-    apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN  # Get from HomeAssistant Profile
-    entity_id: sensor.energy_consumption  # Entity ID with consumption data (in Wh or kWh)
-    history_days: "-7;-14;-21"  # Days to look back for historical data
-    history_weights: "1;1;1"  # Weight for each history period (1-10), higher = more influence
-    cache_ttl_hours: 48.0  # How long to cache computed statistics (hours)
-    multiplier: 1.0  # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
+    base_url: ws://homeassistant:8123 # Your HomeAssistant URL
+    apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN # Get from HomeAssistant Profile
+    entity_id: sensor.energy_consumption # Entity ID with consumption data (in Wh or kWh)
+    history_days: "-7;-14;-21" # Days to look back for historical data
+    history_weights: "1;1;1" # Weight for each history period (1-10), higher = more influence
+    cache_ttl_hours: 48.0 # How long to cache computed statistics (hours)
+    multiplier: 1.0 # Multiplier for forecast adjustment (1.0=unchanged, >1.0=increase, <1.0=decrease)
     sensor_unit: auto # Discover or set sensor unit
   mqtt:
     enabled: false
@@ -137,7 +137,7 @@ schema:
     max_soc: int(0,100)? # (MQTT)  Maximum SoC %, optional for mqtt (default: 100)
     cache_ttl: int(0,)? # (MQTT)  Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
     base_topic: str? #  (MQTT)  base topic, optional for mqtt (default: 'default')
-    max_pv_charge_rate: float(0,)?  # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
+    max_pv_charge_rate: float(0,)? # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')

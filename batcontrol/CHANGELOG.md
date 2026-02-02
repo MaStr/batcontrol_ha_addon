@@ -1,8 +1,32 @@
+# 🚀 Release 0.6.0 - published on 02.02.2026
+
+Default time resolution is 60 minutes.
+
+## What's Changed
+
+- Introducing the 15-minute calculation slots with dynamic up/downsample
+- Configuration for 15 or 60 minutes
+- Expected Consumption Wh per hour is now distributed evenly across the 4 slots.
+- PV is scaled linear between the adjacent hours.
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.7...0.6.0
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.6.0](https://github.com/muexxl/batcontrol/releases/tag/0.6.0)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
 # 🚀 Release 0.5.7 - published on 05.01.2026
 
 ## What's Changed
-* HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
-* HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
+
+- HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
+- HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
 
 **Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.6...0.5.7
 
@@ -19,10 +43,10 @@
 # 🚀 Release 0.5.6 - published on 04.12.2025
 
 ## What's Changed
-* Fix HomeAssistant forecast cache validation to check specific future hours by @Copilot in https://github.com/muexxl/batcontrol/pull/232
-* Fix cache offset bug in HomeAssistant consumption forecast for non-contiguous missing hours by @Copilot in https://github.com/muexxl/batcontrol/pull/235
-* Make Fronius inverter and controller IDs configurable by @Copilot in https://github.com/muexxl/batcontrol/pull/239
 
+- Fix HomeAssistant forecast cache validation to check specific future hours by @Copilot in https://github.com/muexxl/batcontrol/pull/232
+- Fix cache offset bug in HomeAssistant consumption forecast for non-contiguous missing hours by @Copilot in https://github.com/muexxl/batcontrol/pull/235
+- Make Fronius inverter and controller IDs configurable by @Copilot in https://github.com/muexxl/batcontrol/pull/239
 
 **Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.5...0.5.6
 
@@ -39,10 +63,11 @@
 # 🚀 Release 0.5.5 - published on 16.11.2025
 
 ## What's Changed
-* Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
-* Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
-* Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228  Thanks for reporting & testing @magicofit 
-* energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
+
+- Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
+- Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
+- Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228 Thanks for reporting & testing @magicofit
+- energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
 
 **Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.4...0.5.5
 
@@ -56,17 +81,16 @@
 
 👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
 
-
-
 # 🚀 Release 0.5.4 - published on 12.11.2025
 
 ### What's Changed
-* Overwork provider management by @MaStr in https://github.com/muexxl/batcontrol/pull/213
-* (beta) Add generic MQTT inverter driver & restructure mqtt handling & homeassistant discovery by @Copilot in https://github.com/muexxl/batcontrol/pull/196
-*  Homeassistant sensor as consumption forecast by @MaStr & @greteOne in https://github.com/muexxl/batcontrol/pull/214
-* HA consumption input conversion by @MaStr in https://github.com/muexxl/batcontrol/pull/221
-* Ha addon reduce logging by @MaStr in https://github.com/muexxl/batcontrol/pull/222
-* Asynchroneaus forecast fetcher via schedule() by @MaStr in https://github.com/muexxl/batcontrol/pull/223
+
+- Overwork provider management by @MaStr in https://github.com/muexxl/batcontrol/pull/213
+- (beta) Add generic MQTT inverter driver & restructure mqtt handling & homeassistant discovery by @Copilot in https://github.com/muexxl/batcontrol/pull/196
+- Homeassistant sensor as consumption forecast by @MaStr & @greteOne in https://github.com/muexxl/batcontrol/pull/214
+- HA consumption input conversion by @MaStr in https://github.com/muexxl/batcontrol/pull/221
+- Ha addon reduce logging by @MaStr in https://github.com/muexxl/batcontrol/pull/222
+- Asynchroneaus forecast fetcher via schedule() by @MaStr in https://github.com/muexxl/batcontrol/pull/223
 
 **Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.3...0.5.4
 
