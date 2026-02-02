@@ -9,7 +9,7 @@
 - Expected Consumption Wh per hour is now distributed evenly across the 4 slots.
 - PV is scaled linear between the adjecent hours.
 
-# 🚀 Release 0.5.6 - published on 05.01.2026
+# 🚀 Release 0.5.7 - published on 05.01.2026
 
 ## What's Changed
 
