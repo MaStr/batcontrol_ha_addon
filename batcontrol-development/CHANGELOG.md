@@ -1,31 +1,37 @@
-# 🚀 Release 0.6.0 - in development
+# 🚀 Release 0.6.1 - in development
+
+# 🚀 Release 0.6.0 - published on 02.02.2026
 
 ## What's Changed
-* Introducing the 15-minute calculation slots with dynamic up/downsample
-* Configuration for 15 or 60 minutes
-* Expected Consumption Wh per hour is now distributed evenly across the 4 slots.
-* PV is scaled linear between the adjecent hours.
+
+- Introducing the 15-minute calculation slots with dynamic up/downsample
+- Configuration for 15 or 60 minutes
+- Expected Consumption Wh per hour is now distributed evenly across the 4 slots.
+- PV is scaled linear between the adjecent hours.
 
 # 🚀 Release 0.5.6 - published on 05.01.2026
 
 ## What's Changed
-* HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
-* HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
+
+- HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
+- HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
 
 # 🚀 Release 0.5.6 - published on 04.12.2025
 
 ## What's Changed
-* Fix HomeAssistant forecast cache validation to check specific future hours by @Copilot in https://github.com/muexxl/batcontrol/pull/232
-* Fix cache offset bug in HomeAssistant consumption forecast for non-contiguous missing hours by @Copilot in https://github.com/muexxl/batcontrol/pull/235
-* Make Fronius inverter and controller IDs configurable by @Copilot in https://github.com/muexxl/batcontrol/pull/239
+
+- Fix HomeAssistant forecast cache validation to check specific future hours by @Copilot in https://github.com/muexxl/batcontrol/pull/232
+- Fix cache offset bug in HomeAssistant consumption forecast for non-contiguous missing hours by @Copilot in https://github.com/muexxl/batcontrol/pull/235
+- Make Fronius inverter and controller IDs configurable by @Copilot in https://github.com/muexxl/batcontrol/pull/239
 
 # 🚀 Release 0.5.5 - published on 16.11.2025
 
 ## What's Changed
-* Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
-* Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
-* Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228  Thanks for reporting & testing @magicofit 
-* energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
+
+- Add energyforecast.de provider with 48-hour forecast window by @Copilot in https://github.com/muexxl/batcontrol/pull/225
+- Add custom gh-copilot instruction by @MaStr in https://github.com/muexxl/batcontrol/pull/226
+- Fix Tibber class KeyError by fetching from cache like other tariff providers by @Copilot in https://github.com/muexxl/batcontrol/pull/228 Thanks for reporting & testing @magicofit
+- energyforecast: Fix response handling by @MaStr in https://github.com/muexxl/batcontrol/pull/229
 
 # 🚀 Release 0.5.4 - published on 12.11.2025
 
