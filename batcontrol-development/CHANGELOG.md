@@ -1,4 +1,9 @@
-# 🚀 Release 0.6.1 - in development
+
+# 🚀 Release 0.6.2 - on developemnt
+
+# 🚀 Release 0.6.1 - published on 03.02.2026
+
+- Fix Tibber API call
 
 # 🚀 Release 0.6.0 - published on 02.02.2026
 

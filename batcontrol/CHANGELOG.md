@@ -1,3 +1,22 @@
+# 🚀 Release 0.6.1 - published on 03.02.2026
+
+## What's Changed
+
+- Fix in Tibber API call
+
+**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.6.0...0.6.1
+
+---
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.6.1](https://github.com/muexxl/batcontrol/releases/tag/0.6.1)
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+
+
 # 🚀 Release 0.6.0 - published on 02.02.2026
 
 Default time resolution is 60 minutes.

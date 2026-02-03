@@ -1,6 +1,6 @@
 name: "Batcontrol-next"
 description: "Controls the charging of the battery."
-version: "0.6.0"
+version: "0.6.1"
 slug: "batcontrol"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
