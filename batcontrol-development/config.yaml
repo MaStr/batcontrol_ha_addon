@@ -36,6 +36,9 @@ options:
       # future_price <= current_price-min_price_difference/soften_price_difference_on_charging_factor
     soften_price_difference_on_charging_factor: 5
     round_price_digits: 4 # round price to n digits after the comma
+    production_offset_percent: 1.0 # Adjust production forecast by a percentage (1.0 = 100%, 0.8 = 80%, etc.)
+                                   # Useful for winter mode when solar panels are covered with snow
+
   inverter:
     type: dummy #currently only fronius_gen24 supported
     address: 192.168.0.XX # the local IP of your inverter. needs to be reachable from the machine that runs batcontrol
@@ -127,6 +130,8 @@ schema:
       # future_price <= current_price-min_price_difference/soften_price_difference_on_charging_factor
     soften_price_difference_on_charging_factor: int
     round_price_digits: int # round price to n digits after the comma
+    production_offset_percent: float(0,) # Adjust production forecast by a percentage (1.0 = 100%, 0.8 = 80%, etc.)
+                                   # Useful for winter mode when solar panels are covered with snow
   inverter:
     type: list(fronius_gen24|dummy|mqtt)
     address: str? # the local IP of your inverter. Required for fronius_gen24

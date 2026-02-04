@@ -1,6 +1,10 @@
 
 # 🚀 Release 0.6.2 - on developemnt
 
+- Production offset to modify forecast results.
+  Available via config, MQTT + HA Sensor. Changes via API will be resettet after
+  an reboot.
+
 # 🚀 Release 0.6.1 - published on 03.02.2026
 
 - Fix Tibber API call
