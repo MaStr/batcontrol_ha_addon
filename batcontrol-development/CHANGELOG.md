@@ -1,7 +1,7 @@
 
 # 🚀 Release 0.6.2 - on developemnt
 
-- Production offset to modify forecast results.
+- Production offset to modify forecast results.q
   Available via config, MQTT + HA Sensor. Changes via API will be resettet after
   an reboot.
 
