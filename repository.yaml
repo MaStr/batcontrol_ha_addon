@@ -1,4 +1,4 @@
 # https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
 name: Alternative batcontrol add-on repository
-url: 'https://github.com/MaStr/ha_addons'
+url: 'https://github.com/MaStr/batcontrol_ha_addon'
 maintainer: Matthias Strubel <matthias.strubel@aod-rpg.de>
