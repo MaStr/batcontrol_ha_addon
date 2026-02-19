@@ -4,17 +4,17 @@
 
 - Fix in Tibber API call
 
-**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.6.0...0.6.1
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.6.0...0.6.1 _(repository moved)_
 
 ---
 
 ### 📌 Full Release Notes
 
-👉 [GitHub Release v0.6.1](https://github.com/muexxl/batcontrol/releases/tag/0.6.1)
+👉 [GitHub Release v0.6.1](https://github.com/MaStr/batcontrol/releases/tag/0.6.1) _(repository moved)_
 
 ### 📚 Wiki
 
-👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) _(repository moved)_
 
 
 # 🚀 Release 0.6.0 - published on 02.02.2026
@@ -28,17 +28,17 @@ Default time resolution is 60 minutes.
 - Expected Consumption Wh per hour is now distributed evenly across the 4 slots.
 - PV is scaled linear between the adjacent hours.
 
-**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.7...0.6.0
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.5.7...0.6.0 _(repository moved)_
 
 ---
 
 ### 📌 Full Release Notes
 
-👉 [GitHub Release v0.6.0](https://github.com/muexxl/batcontrol/releases/tag/0.6.0)
+👉 [GitHub Release v0.6.0](https://github.com/MaStr/batcontrol/releases/tag/0.6.0) _(repository moved)_
 
 ### 📚 Wiki
 
-👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) _(repository moved)_
 
 # 🚀 Release 0.5.7 - published on 05.01.2026
 
@@ -47,17 +47,17 @@ Default time resolution is 60 minutes.
 - HomeAssistant Addon - Add configuration option for sensor unit to avoid get_sensor call.
 - HomeAssistant Addon - get_entity call, increase limit for websocket call to 4 MB
 
-**Full Changelog**: https://github.com/muexxl/batcontrol/compare/0.5.6...0.5.7
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.5.6...0.5.7 _(repository moved)_
 
 ---
 
 ### 📌 Full Release Notes
 
-👉 [GitHub Release v0.5.7](https://github.com/muexxl/batcontrol/releases/tag/0.5.7)
+👉 [GitHub Release v0.5.7](https://github.com/MaStr/batcontrol/releases/tag/0.5.7) _(repository moved)_
 
 ### 📚 Wiki
 
-👉 [Project Wiki](https://github.com/muexxl/batcontrol/wiki)
+👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) _(repository moved)_
 
 # 🚀 Release 0.5.6 - published on 04.12.2025
 
