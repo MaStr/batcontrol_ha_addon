@@ -7,7 +7,7 @@ This software helps you to get the additional energy at the cheapest price by co
 ## Customizing the load profile. (HA ADDON)
 
 Step 1
-download the default profile from https://raw.githubusercontent.com/muexxl/batcontrol/b08fa281efd63f5087d2da777e14f4403b5d3357/config/load_profile.csv
+download the default profile from https://raw.githubusercontent.com/MaStr/batcontrol/b08fa281efd63f5087d2da777e14f4403b5d3357/config/load_profile.csv
 
 Step 2
 edit the load profile according to your requirements.
@@ -22,7 +22,7 @@ Restart the addon
 ## Wiki
 
 The Wiki of the underlying project provides further and up-to-date information about the project and its configuration parameters
-https://github.com/muexxl/batcontrol/wiki
+https://github.com/MaStr/batcontrol/wiki
 
 ## Configuration Parameters
 
@@ -65,7 +65,7 @@ Awattar only provides the EPEX Spot prices via the API. So the final price is ca
 
 ### `solar_forecast_provider`:
 
-choose betwween fcsolarapi and solarprognose. Check https://github.com/muexxl/batcontrol/wiki/Solar-Forecast for details.
+choose betwween fcsolarapi and solarprognose. Check https://github.com/MaStr/batcontrol/wiki/Solar-Forecast for details.
 
 ### `pvinstallations`:
 
