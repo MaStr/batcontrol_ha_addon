@@ -6,14 +6,14 @@ FROM $BUILD_FROM AS builder
 ARG BUILD_VERSION
 
 # Download wheel from from releases into /wheels
-# https://github.com/muexxl/batcontrol/releases/download/0.5.3/batcontrol-0.5.3-py3-none-any.whl
+# https://github.com/MaStr/batcontrol/releases/download/0.5.3/batcontrol-0.5.3-py3-none-any.whl
 # and source code tar.gz
-# https://github.com/muexxl/batcontrol/archive/refs/tags/0.5.3.tar.gz
+# https://github.com/MaStr/batcontrol/archive/refs/tags/0.5.3.tar.gz
 RUN mkdir /wheels && \
     wget -O /wheels/batcontrol-"${BUILD_VERSION}"-py3-none-any.whl \
-    https://github.com/muexxl/batcontrol/releases/download/${BUILD_VERSION}/batcontrol-${BUILD_VERSION}-py3-none-any.whl && \
+    https://github.com/MaStr/batcontrol/releases/download/${BUILD_VERSION}/batcontrol-${BUILD_VERSION}-py3-none-any.whl && \
     wget -O /batcontrol-"${BUILD_VERSION}".tar.gz \
-    https://github.com/muexxl/batcontrol/archive/refs/tags/${BUILD_VERSION}.tar.gz
+    https://github.com/MaStr/batcontrol/archive/refs/tags/${BUILD_VERSION}.tar.gz
 
 # Extract source to /batcontrol
 RUN mkdir /batcontrol && \

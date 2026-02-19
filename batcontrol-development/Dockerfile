@@ -5,12 +5,12 @@ FROM $BUILD_FROM AS builder
 
 ARG BUILD_VERSION
 
-# Fetch the source code as zip from Github muexxler/batcontrol
-# https://github.com/muexxl/batcontrol/archive/refs/heads/main.zip
+# Fetch the source code as zip from Github MaStr/batcontrol
+# https://github.com/MaStr/batcontrol/archive/refs/heads/main.zip
 # and Extract source to /batcontrol
 RUN mkdir /batcontrol && \
     wget -O /batcontrol/batcontrol.zip \
-    https://github.com/muexxl/batcontrol/archive/refs/heads/main.zip && \
+    https://github.com/MaStr/batcontrol/archive/refs/heads/main.zip && \
     unzip /batcontrol/batcontrol.zip -d /batcontrol && \
     mv /batcontrol/batcontrol-main/* /batcontrol/ && \
     rm -rf /batcontrol/batcontrol-main && \
