@@ -13,7 +13,7 @@ Alternatives are MQTT based inverter interface for your own implementations.
 
 batcontrol connects to evcc, if you like to.
 
-You find more under:  [batcontrol wiki](https://github.com/muexxl/batcontrol/wiki)
+You find more under:  [batcontrol wiki](https://github.com/MaStr/batcontrol/wiki)
 
 ## Support my work
 

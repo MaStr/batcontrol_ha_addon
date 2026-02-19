@@ -1,6 +1,6 @@
 ### batcontrol development Branch
 
-This repository is not following the rule of versioning. It reflects the latest development state of the origin repository muexxl/batcontrol .
+This repository is not following the rule of versioning. It reflects the latest development state of the origin repository MaStr/batcontrol .
 It may brake anytime, configuration may be invalidated.
 
 **Use for testing purposes only.**
@@ -19,7 +19,7 @@ This software has not been tested on many devices and should be considered exper
 ## Further information
 
 For further details, ongoing discussions, bugs and features you may check the main repository of batcontrol.
-https://github.com/muexxl/batcontrol
+https://github.com/MaStr/batcontrol
 
 ## Support my work
 

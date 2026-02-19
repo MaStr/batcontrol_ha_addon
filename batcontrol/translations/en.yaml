@@ -31,7 +31,7 @@ configuration:
   #   # markup: 0.03 # only required for awattar
   solar_forecast_provider:
     name: Solar forecast provider
-    description: Choose your solar forecast provider. Check https://github.com/muexxl/batcontrol/wiki/Solar-Forecast for details.
+    description: Choose your solar forecast provider. Check https://github.com/MaStr/batcontrol/wiki/Solar-Forecast for details.
   pvinstallations:
     name: PV Installations
     description: A list of your PV installations. An installation is one area with aligned modules. Independent of the number of inverters or strings.
