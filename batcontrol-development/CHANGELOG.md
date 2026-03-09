@@ -1,9 +1,18 @@
 
-# 🚀 Release 0.6.2 - on developemnt
+# 🚀 Release 0.7.0 - on development
 
-- Production offset to modify forecast results.q
-  Available via config, MQTT + HA Sensor. Changes via API will be resettet after
-  an reboot.
+## What's Changed
+
+- **New Multi-Zone Tariff Provider**: Introducing `tariff_zones` provider supporting up to 3 different price zones for flexible tariff configurations (e.g., day/night rates, peak/off-peak pricing)
+  - Replaces the previous two-tariff implementation
+  - Supports flexible hour format: ranges (`7-22`), comma-separated (`0,1,2`), or mixed (`0-5,23`)
+  - All 24 hours must be assigned to exactly one zone
+  - Optional third zone for complex tariff structures
+  
+- **Production offset**: Modify forecast results via configuration parameter `production_offset_percent`
+  - Available via config, MQTT + HA Sensor
+  - Useful for winter mode when solar panels are covered with snow
+  - Changes via API will be reset after a reboot
 
 # 🚀 Release 0.6.1 - published on 03.02.2026
 

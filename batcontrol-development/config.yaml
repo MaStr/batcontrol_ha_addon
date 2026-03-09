@@ -49,12 +49,18 @@ options:
     fronius_inverter_id: "1" # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: "0" # Optional: ID of the controller in Fronius API (default: '0')
   utility:
-    type: awattar_de #tibber, awattar_at, awattar_de, evcc
-    apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber
+    type: awattar_de #tibber, awattar_at, awattar_de, evcc, energyforecast, energyforecast_96, tariff_zones
+    apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber & energyforecast
     url: http://evcc.local:7070/api/tariff/grid # only required for evcc
-    vat: 0.19 # only required for awattar
-    fees: 0.015 # only required for awattar
-    markup: 0.03 # only required for awattar
+    vat: 0.19 # only required for awattar and energyforecast
+    fees: 0.015 # only required for awattar and energyforecast
+    markup: 0.03 # only required for awattar and energyforecast
+    # tariff_zone_1: 0.2733 # only required for tariff_zones, Euro/kWh incl. vat/fees (peak hours)
+    # zone_1_hours: "7-22" # only required for tariff_zones, hours assigned to zone 1; supports ranges (7-22), singles (7), or mixed (0-5,6,7)
+    # tariff_zone_2: 0.1734 # only required for tariff_zones, Euro/kWh incl. vat/fees (off-peak hours)
+    # zone_2_hours: "0-6,23" # only required for tariff_zones, hours assigned to zone 2 (must cover remaining hours)
+    # tariff_zone_3: 0.2100 # optional for tariff_zones, third zone price
+    # zone_3_hours: "17-20" # optional for tariff_zones, hours for zone 3 (must not overlap with zone 1 or 2)
   solar_forecast_provider: fcsolarapi
   pvinstallations:
     - name: Haus #name
@@ -147,12 +153,18 @@ schema:
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
   utility:
-    type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_96)
+    type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_96|tariff_zones)
     apikey: password? # only required for tibber & energyforecast
     url: str? # only required for evcc
     vat: float(0,10)? # only required for awattar and energyforecast
     fees: float(0,10)? # only required for awattar and energyforecast
     markup: float(0,10)? # only required for awattar and energyforecast
+    tariff_zone_1: float(0,)? # only required for tariff_zones, Euro/kWh incl. vat/fees
+    zone_1_hours: str? # only required for tariff_zones, hours assigned to zone 1
+    tariff_zone_2: float(0,)? # only required for tariff_zones, Euro/kWh incl. vat/fees
+    zone_2_hours: str? # only required for tariff_zones, hours assigned to zone 2
+    tariff_zone_3: float(0,)? # optional for tariff_zones, Euro/kWh incl. vat/fees
+    zone_3_hours: str? # optional for tariff_zones, hours assigned to zone 3
   solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar)?
   pvinstallations:
     - name: str #name
