@@ -48,6 +48,9 @@ options:
     max_grid_charge_rate: 5000 # Watt
     fronius_inverter_id: "1" # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: "0" # Optional: ID of the controller in Fronius API (default: '0')
+    # enable_resilient_wrapper: false # Optional: Enable resilient wrapper for graceful outage handling (default: false)
+    # outage_tolerance_minutes: 24 # Optional: Minutes to tolerate inverter outages before terminating (default: 24)
+    # retry_backoff_seconds: 60 # Optional: Seconds to wait before retrying after failure (default: 60)
   utility:
     type: awattar_de #tibber, awattar_at, awattar_de, evcc, energyforecast, energyforecast_96, tariff_zones
     apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber & energyforecast
@@ -70,6 +73,12 @@ options:
       azimuth: -90 # -90:East, 0:South, 90:West -180..180
       kWp: 15.695 # power in kWp
       url: http://evcc.local:7070/api/tariff/solar # only required for evcc-solar
+      # For HomeAssistant Solar Forecast ML (HACS integration):
+      # base_url: ws://homeassistant:8123 # HomeAssistant WebSocket URL
+      # api_token: YOUR_LONG_LIVED_ACCESS_TOKEN # Long-lived access token from HA Profile
+      # entity_id: sensor.solar_forecast_ml_prognose_nachste_stunde # Forecast sensor entity ID
+      # sensor_unit: auto # Options: 'auto' (default), 'Wh', or 'kWh'
+      # cache_ttl_hours: 24.0 # Cache duration in hours (default: 24.0)
   consumption_forecast:
     type: csv
     annual_consumption: 4500 # total consumption in kWh p.a. the load profile
@@ -152,6 +161,9 @@ schema:
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
+    enable_resilient_wrapper: bool? # Enable resilient wrapper for graceful outage handling (default: false)
+    outage_tolerance_minutes: int(1,)? # Minutes to tolerate inverter outages before terminating (default: 24)
+    retry_backoff_seconds: int(1,)? # Seconds to wait before retrying after failure (default: 60)
   utility:
     type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_96|tariff_zones)
     apikey: password? # only required for tibber & energyforecast
@@ -165,7 +177,7 @@ schema:
     zone_2_hours: str? # only required for tariff_zones, hours assigned to zone 2
     tariff_zone_3: float(0,)? # optional for tariff_zones, Euro/kWh incl. vat/fees
     zone_3_hours: str? # optional for tariff_zones, hours assigned to zone 3
-  solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar)?
+  solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar|homeassistant-solar-forecast-ml)?
   pvinstallations:
     - name: str #name
       lat: float(,90)?
@@ -179,6 +191,11 @@ schema:
       item: str? #solarprognose
       token: str? #solarprognose
       horizon: str? #forecastsolarapi horizon modifier
+      base_url: str? # homeassistant-solar-forecast-ml: HomeAssistant WebSocket URL
+      api_token: str? # homeassistant-solar-forecast-ml: Long-lived access token
+      entity_id: str? # homeassistant-solar-forecast-ml: Forecast sensor entity ID
+      sensor_unit: list(auto|Wh|kWh)? # homeassistant-solar-forecast-ml: Sensor unit (default: auto)
+      cache_ttl_hours: float(0,)? # homeassistant-solar-forecast-ml: Cache TTL in hours (default: 24.0)
   consumption_forecast:
     type: list(csv|homeassistant-api)
     annual_consumption: float(0,)? # CSV - total consumption in kWh p.a. the load profile
