@@ -52,7 +52,8 @@ RUN apk add --no-cache \
 COPY --from=builder /wheels /wheels
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --prefer-binary /wheels/*.whl
+# Install with [mcp] extra for MCP server support (requires Python >=3.10)
+RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --prefer-binary "/wheels/*.whl[mcp]"
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
 ENV BATCONTROL_GIT_SHA=${GIT_SHA}
