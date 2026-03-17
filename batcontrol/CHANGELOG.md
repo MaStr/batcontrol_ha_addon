@@ -1,3 +1,20 @@
+# 🚀 Release 0.7.1 - Released on 17.03.2026
+
+## What's Changed
+
+- Fix type conversion error in interval_minutes
+
+
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.7.0...0.7.1
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.7.1](https://github.com/MaStr/batcontrol/releases/tag/0.7.1) 
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) 
+
 
 # 🚀 Release 0.7.0 - Released on 17.03.2026
 
