@@ -2,6 +2,8 @@
 
 ## What's Changed
 
+- Support for the homeassistant evcc-sensor fomr ML solar forecastprediction
+
 # 🚀 Release 0.7.1 - Released on 17.03.2026
 
 ## What's Changed
