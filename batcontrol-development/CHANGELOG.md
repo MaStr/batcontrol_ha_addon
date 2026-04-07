@@ -1,4 +1,6 @@
-# 🚀 Release 0.7.2 - on development
+# Release 0.7.3 - in Development
+
+# 🚀 Release 0.7.2 - Released on 07.04.2026
 
 ## What's Changed
 

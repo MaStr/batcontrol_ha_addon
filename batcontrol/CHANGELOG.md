@@ -1,3 +1,20 @@
+# 🚀 Release 0.7.2 - Released on 07.04.2026
+
+## What's Changed
+
+- Support for the homeassistant evcc-sensor fomr ML solar forecastprediction
+
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.7.1...0.7.2
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.7.2](https://github.com/MaStr/batcontrol/releases/tag/0.7.2) 
+
+### 📚 Wiki
+
+👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) 
+
+
 # 🚀 Release 0.7.1 - Released on 17.03.2026
 
 ## What's Changed
