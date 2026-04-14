@@ -1,4 +1,29 @@
-# Release 0.7.3 - in Development
+# Release 0.8.0 - in Development
+
+## What's Changed
+
+### 🌟 Major New Features
+
+- **Peak Shaving** (#328): Limits PV-to-battery charge rate so the battery fills gradually instead of reaching 100% by midday. Preserves free capacity to absorb more solar energy later in the day and reduces unnecessary grid feed-in.
+  - Three modes: `time` (counter-linear ramp), `price` (cheap-slot reservation), `combined` (both, stricter wins)
+  - Configurable target hour (`allow_full_battery_after`) and price threshold (`price_limit`)
+  - MQTT runtime control for enable/disable and target hour
+  - Home Assistant auto-discovery (switch, number, sensor)
+  - Requires logic type `next` in `battery_control.type`
+  - See [Peak Shaving wiki page](https://github.com/MaStr/batcontrol/wiki/Peak-Shaving) for details
+
+- **Single-Zone Static Price Mode** (#324): The `tariff_zones` provider now supports 1, 2, or 3 zones. When only `tariff_zone_1` is configured, it acts as a static flat-price mode for the whole day.
+
+### ✨ Enhancements
+
+- **New Logic Type `next`**: Selectable via `battery_control.type: next`. Front-runs upcoming changes and includes peak shaving support. The `default` logic remains unchanged.
+- **Scheduler Isolation** (#326): Scheduler state is isolated from the schedule library's global singleton, improving testability and reliability.
+- **Removed Legacy HomeAssistant Sensor Formats** (#327): Legacy `hours_list` and `hour_N` sensor formats have been removed. Only the evcc-compatible format remains.
+
+### 🔧 Technical Updates
+
+- Build: switched test setup from pip to uv
+- Tests: improved coverage for inverter factory, core dispatch, and pytest configuration
 
 # 🚀 Release 0.7.2 - Released on 07.04.2026
 

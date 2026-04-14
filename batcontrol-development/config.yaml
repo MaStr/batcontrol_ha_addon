@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.7.3dev"
+version: "0.8.0dev"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -22,6 +22,7 @@ options:
   log_everything: false # if false debug messages from fronius.auth and urllib3.connectionpool will be suppressed
   max_logfile_size: 100 #kB
   battery_control:
+    type: default # Logic type: 'default' (standard) or 'next' (includes peak shaving support)
     min_price_difference: 0.05 # minimum price difference in Euro to justify charging your battery
     min_price_difference_rel:
       0.10 # Percentage (in decimal) of the current price to justify charging your battery
@@ -29,7 +30,13 @@ options:
     always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     min_recharge_amount: 100 # in Wh, start & minimum amount of energy to recharge the battery
+  peak_shaving:
+    enabled: false
+    mode: combined # 'time' | 'price' | 'combined' - algorithm mode
+    allow_full_battery_after: 14 # Hour (0-23) - battery should be full by this hour
+    price_limit: 0.05 # Euro/kWh - slots at or below this price are "cheap"
   battery_control_expert:
+    type: default # default or expert, default uses only min_price_difference, expert also uses min_price_difference_rel and allows to set the additional parameters below
     charge_rate_multiplier: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
       False # enable earlier charging based on a more relaxed calculation
@@ -45,6 +52,7 @@ options:
     user: customer #customer or technician lowercase only!!
     password: YOUR-PASSWORD #
     max_pv_charge_rate: 0 # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
+    min_pv_charge_rate: 0 # Watt, lower limit for PV charge rate in Mode 8 (peak shaving). 0 = no floor.
     max_grid_charge_rate: 5000 # Watt
     fronius_inverter_id: "1" # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: "0" # Optional: ID of the controller in Fronius API (default: '0')
@@ -133,11 +141,17 @@ schema:
   log_everything: bool
   max_logfile_size: int
   battery_control:
+    type: list(default|next)? # Logic type: 'default' (standard) or 'next' (includes peak shaving)
     min_price_difference: float(0,) # minimum price difference in Euro to justify charging your battery
     min_price_difference_rel: float(0,)?
     always_allow_discharge_limit: float(0,1) # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: float(0,1) # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     min_recharge_amount: int(0,)? # in Wh, start & minimum amount of energy to recharge the battery
+  peak_shaving:
+    enabled: bool? # Enable/disable peak shaving (default: false)
+    mode: list(time|price|combined)? # Algorithm mode (default: combined)
+    allow_full_battery_after: int(0,23)? # Hour (0-23) - battery should be full by this hour (default: 14)
+    price_limit: float? # Euro/kWh - cheap-price threshold. Required for modes 'price' and 'combined'
   battery_control_expert:
     charge_rate_multiplier: float(0,) # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
@@ -158,6 +172,7 @@ schema:
     cache_ttl: int(0,)? # (MQTT)  Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
     base_topic: str? #  (MQTT)  base topic, optional for mqtt (default: 'default')
     max_pv_charge_rate: float(0,)? # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
+    min_pv_charge_rate: float(0,)? # Watt, lower limit for PV charge rate in Mode 8 (peak shaving). 0 = no floor.
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
