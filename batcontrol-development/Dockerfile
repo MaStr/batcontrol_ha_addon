@@ -5,6 +5,9 @@ FROM $BUILD_FROM AS builder
 
 ARG BUILD_VERSION
 
+# Install uv for fast, reliable Python packaging
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
 # Fetch the source code as zip from Github MaStr/batcontrol
 # https://github.com/MaStr/batcontrol/archive/refs/heads/main.zip
 # and Extract source to /batcontrol
@@ -16,16 +19,10 @@ RUN mkdir /batcontrol && \
     rm -rf /batcontrol/batcontrol-main && \
     rm /batcontrol/batcontrol.zip
 
-# Install build dependencies
-RUN apk add --no-cache \
-            python3-dev \
-            py3-pip \
-            py3-setuptools 
-# Build the wheel package
+# Install build dependencies and build the wheel package
+RUN apk add --no-cache python3-dev
 WORKDIR /batcontrol
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir=/wheels .
+RUN uv build --wheel --out-dir /wheels
 
 
 ARG BUILD_FROM
@@ -39,20 +36,20 @@ LABEL org.opencontainers.image.source = "https://github.com/MaStr/batcontrol_ha_
 LABEL org.opencontainers.image.description="(SNAPSHOT) Alternate batcontrol add-on for Home Assistant"
 LABEL org.opencontainers.image.licenses=MIT
 
+# Install uv for fast, reliable Python packaging
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
 # Copy the built wheel from the builder stage and install it
 COPY --from=builder /wheels /wheels
 
 # Install runtime dependencies
 RUN apk add --no-cache \
             python3 \
-            py3-pip \
-            py3-setuptools \
             tzdata
 
-COPY --from=builder /wheels /wheels
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --prefer-binary /wheels/*.whl
+# --index-strategy unsafe-best-match: check all indexes for best matching version (like pip)
+RUN uv pip install --system --no-cache --index-strategy unsafe-best-match --extra-index-url https://piwheels.org/simple /wheels/*.whl && \
+    rm -rf /wheels /usr/local/bin/uv
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
 ENV BATCONTROL_GIT_SHA=${GIT_SHA}

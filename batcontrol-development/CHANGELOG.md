@@ -22,7 +22,7 @@
 
 ### 🔧 Technical Updates
 
-- Build: switched test setup from pip to uv
+- Build: switched from pip to uv for Docker image builds and test setup
 - Tests: improved coverage for inverter factory, core dispatch, and pytest configuration
 
 # 🚀 Release 0.7.2 - Released on 07.04.2026
