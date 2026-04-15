@@ -6,7 +6,7 @@ FROM $BUILD_FROM AS builder
 ARG BUILD_VERSION
 
 # Install uv for fast, reliable Python packaging
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /usr/local/bin/uv
 
 # Fetch the source code as zip from Github MaStr/batcontrol
 # https://github.com/MaStr/batcontrol/archive/refs/heads/main.zip
@@ -37,7 +37,7 @@ LABEL org.opencontainers.image.description="(SNAPSHOT) Alternate batcontrol add-
 LABEL org.opencontainers.image.licenses=MIT
 
 # Install uv for fast, reliable Python packaging
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /usr/local/bin/uv
 
 # Copy the built wheel from the builder stage and install it
 COPY --from=builder /wheels /wheels
@@ -47,8 +47,8 @@ RUN apk add --no-cache \
             python3 \
             tzdata
 
-# --index-strategy unsafe-best-match: check all indexes for best matching version (like pip)
-RUN uv pip install --system --no-cache --index-strategy unsafe-best-match --extra-index-url https://piwheels.org/simple /wheels/*.whl && \
+# Prefer piwheels for compatible wheels and fall back to PyPI
+RUN uv pip install --system --no-cache --index-url https://piwheels.org/simple --extra-index-url https://pypi.org/simple /wheels/*.whl && \
     rm -rf /wheels /usr/local/bin/uv
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
