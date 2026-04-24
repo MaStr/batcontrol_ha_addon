@@ -22,8 +22,9 @@
 
 ### 🔧 Technical Updates
 
-- Build: switched from pip to uv for Docker image builds and test setup
+- Build: switched from pip to uv for Docker image builds and test setup (dev image)
 - Tests: improved coverage for inverter factory, core dispatch, and pytest configuration
+- Removed depricated architectures armhf & armv7
 
 # 🚀 Release 0.7.2 - Released on 07.04.2026
 
