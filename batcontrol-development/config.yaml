@@ -7,8 +7,6 @@ init: false
 arch:
   - aarch64
   - amd64
-  - armhf
-  - armv7
 map:
   - type: ssl
   - type: addon_config
