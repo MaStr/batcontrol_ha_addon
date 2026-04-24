@@ -19,11 +19,18 @@
 - **New Logic Type `next`**: Selectable via `battery_control.type: next`. Front-runs upcoming changes and includes peak shaving support. The `default` logic remains unchanged.
 - **Scheduler Isolation** (#326): Scheduler state is isolated from the schedule library's global singleton, improving testability and reliability.
 - **Removed Legacy HomeAssistant Sensor Formats** (#327): Legacy `hours_list` and `hour_N` sensor formats have been removed. Only the evcc-compatible format remains.
+- **Peak Shaving Config Validation** (#336): Added explicit `PeakShavingConfig` validation and improved fallback behavior for `combined` mode.
+- **MQTT Control/Discovery Improvements** (#338, #340, #342, #343, #344, #345, #347):
+  - Exposes `limit-battery-charge` mode and charge-rate limit in Home Assistant auto-discovery
+  - Publishes API override state to MQTT
+  - Refreshes and publishes control state updates immediately (including price difference and charge-limit changes)
+  - Refactors shared MQTT control topic helpers for consistency
 
 ### 🔧 Technical Updates
 
 - Build: switched from pip to uv for Docker image builds and test setup (dev image)
 - Tests: improved coverage for inverter factory, core dispatch, and pytest configuration
+- Tests: added/expanded characterization tests for inverter battery math and mode contracts (#333, #334)
 - Removed depricated architectures armhf & armv7
 
 # 🚀 Release 0.7.2 - Released on 07.04.2026
