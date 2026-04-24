@@ -36,20 +36,22 @@ LABEL org.opencontainers.image.source = "https://github.com/MaStr/batcontrol_ha_
 LABEL org.opencontainers.image.description="(SNAPSHOT) Alternate batcontrol add-on for Home Assistant"
 LABEL org.opencontainers.image.licenses=MIT
 
-# Install uv for fast, reliable Python packaging
-COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /usr/local/bin/uv
+## Install uv for fast, reliable Python packaging
+#COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /usr/local/bin/uv
 
 # Copy the built wheel from the builder stage and install it
 COPY --from=builder /wheels /wheels
 
 # Install runtime dependencies
 RUN apk add --no-cache \
-            python3 \
             tzdata
 
 # Prefer piwheels for compatible wheels and fall back to PyPI
-RUN uv pip install --system --no-cache --index-url https://piwheels.org/simple --extra-index-url https://pypi.org/simple /wheels/*.whl && \
-    rm -rf /wheels /usr/local/bin/uv
+RUN pip install --system --no-cache --index-url https://piwheels.org/simple --extra-index-url https://pypi.org/simple /wheels/*.whl && \
+    rm -rf /wheels
+
+#RUN uv pip install --system --no-cache --index-url https://piwheels.org/simple --extra-index-url https://pypi.org/simple /wheels/*.whl && \
+#    rm -rf /wheels /usr/local/bin/uv
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
 ENV BATCONTROL_GIT_SHA=${GIT_SHA}
