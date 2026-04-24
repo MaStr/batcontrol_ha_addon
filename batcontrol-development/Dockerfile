@@ -47,11 +47,7 @@ RUN apk add --no-cache \
             tzdata
 
 # Prefer piwheels for compatible wheels and fall back to PyPI
-RUN pip install --system --no-cache --index-url https://piwheels.org/simple --extra-index-url https://pypi.org/simple /wheels/*.whl && \
-    rm -rf /wheels
-
-#RUN uv pip install --system --no-cache --index-url https://piwheels.org/simple --extra-index-url https://pypi.org/simple /wheels/*.whl && \
-#    rm -rf /wheels /usr/local/bin/uv
+RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --prefer-binary /wheels/*.whl
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
 ENV BATCONTROL_GIT_SHA=${GIT_SHA}
