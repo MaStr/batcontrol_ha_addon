@@ -34,7 +34,6 @@ options:
     allow_full_battery_after: 14 # Hour (0-23) - battery should be full by this hour
     price_limit: 0.05 # Euro/kWh - slots at or below this price are "cheap"
   battery_control_expert:
-    type: default # default or expert, default uses only min_price_difference, expert also uses min_price_difference_rel and allows to set the additional parameters below
     charge_rate_multiplier: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
       False # enable earlier charging based on a more relaxed calculation
