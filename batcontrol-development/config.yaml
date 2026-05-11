@@ -27,6 +27,7 @@ options:
       #    _rel helps to avoid charging at high prices with less efficiency
     always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
+    # min_grid_charge_soc: 0.55        # optional 0.00 to 1.00 target to preserve/charge before expensive slots
     min_recharge_amount: 100 # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: false
@@ -42,6 +43,7 @@ options:
     round_price_digits: 4 # round price to n digits after the comma
     production_offset_percent: 1.0 # Adjust production forecast by a percentage (1.0 = 100%, 0.8 = 80%, etc.)
                                    # Useful for winter mode when solar panels are covered with snow
+    preserve_min_grid_charge_soc: false # If true, also preserve min_grid_charge_soc as reserved energy during cheap/pre-expensive slots
 
   inverter:
     type: dummy #currently only fronius_gen24 supported
@@ -143,6 +145,7 @@ schema:
     min_price_difference_rel: float(0,)?
     always_allow_discharge_limit: float(0,1) # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: float(0,1) # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
+    min_grid_charge_soc: float(0,1)? # optional 0.00 to 1.00 target to preserve/charge before expensive slots
     min_recharge_amount: int(0,)? # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: bool? # Enable/disable peak shaving (default: false)
@@ -158,8 +161,9 @@ schema:
     round_price_digits: int # round price to n digits after the comma
     production_offset_percent: float(0,) # Adjust production forecast by a percentage (1.0 = 100%, 0.8 = 80%, etc.)
                                    # Useful for winter mode when solar panels are covered with snow
+    preserve_min_grid_charge_soc: bool? # If true, also preserve min_grid_charge_soc as reserved energy during cheap/pre-expensive slots
   inverter:
-    type: list(fronius_gen24|dummy|mqtt)
+    type: list(fronius_gen24|fronius-modbus|dummy|mqtt)
     address: str? # the local IP of your inverter. Required for fronius_gen24
     user: list(customer|technician)? # Required for fronius_gen24
     password: password?
@@ -171,6 +175,9 @@ schema:
     max_pv_charge_rate: float(0,)? # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     min_pv_charge_rate: float(0,)? # Watt, lower limit for PV charge rate in Mode 8 (peak shaving). 0 = no floor.
     max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
+    port: int(1,65535)? # (fronius-modbus) Modbus TCP port (default: 502)
+    unit_id: int(1,)? # (fronius-modbus) Modbus unit ID (default: 1)
+    revert_seconds: int(0,)? # (fronius-modbus) seconds before reverting to default mode (default: 0)
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
     enable_resilient_wrapper: bool? # Enable resilient wrapper for graceful outage handling (default: false)
