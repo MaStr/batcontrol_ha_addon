@@ -1,6 +1,51 @@
 # Release 0.8.1 - in Development
 
-"Make it real" - Cypecore
+## What's Changed
+
+### New Features
+
+- **Dynamic Network Fees - Section 14a EnWG** (#364): Adds time-variable network fee surcharges
+  to energy prices for providers that calculate fees locally (Awattar, Energyforecast). Fees are
+  sourced from `dyn-net.batcontrol.software`, cached for 12 hours, and applied net before VAT.
+  Activate via the new top-level `dynamic_network_fees` config block (see config example).
+  Providers that already include fees (Tibber, evcc, tariff_zones) are unaffected.
+
+- **Night Surplus Forecast** (#372): New MQTT sensor `night_surplus_wh` - reports how much
+  usable battery energy is expected to remain when the next solar production window begins.
+  Useful for driving flexible loads (heat pump, EV) during the overnight hours before dawn
+  without running the battery flat. Published via MQTT with Home Assistant auto-discovery.
+
+- **Solar Surplus and Solar Active MQTT Sensors** (#370): Two new MQTT sensors published after
+  each control cycle:
+  - `solar_surplus_wh`: expected usable solar surplus in Wh for the current/next production window
+  - `solar_active`: binary sensor (`true`/`false`) indicating whether solar production is currently active
+  Both are available via Home Assistant MQTT auto-discovery.
+
+### Enhancements
+
+- **Solar Forecast Padded to Midnight** (#373): Solar forecast providers (e.g. FCSolar,
+  SolarPrognose) often stop returning data at the last production interval (e.g. 21:00), leaving
+  the rest of the day uncovered. batcontrol now pads the forecast with zero-production entries
+  up to midnight, extending the effective planning horizon by up to 3 hours. DST transitions
+  are handled correctly.
+
+- **Configurable Daily Market Price Hard Refresh** (#367): EPEX Spot next-day prices are
+  typically published around 12:00-13:00 UTC. The normal hourly polling could miss these for
+  an extended time. A dedicated daily hard refresh now bypasses the cache and fetches fresh
+  price data at a configurable UTC time. Configure via `battery_control_expert.market_price_refresh_time`
+  (default: `"12:30"`). Applies to all dynamic tariff providers.
+
+- **Solar API Rate Limit Protection** (#369): The solar forecast refresh interval is now set
+  independently from the general API call interval. Providers such as FCSolar and SolarPrognose
+  allow only 20 API calls per day. The new dedicated interval of ~80 minutes (18 calls/day)
+  prevents quota exhaustion while leaving 2 requests in reserve for restarts or transient errors.
+
+### Internal Changes
+
+- Added `CLAUDE.md` developer documentation to the batcontrol repository with architecture
+  notes, module map, testing conventions, and known pitfalls for development sessions.
+- Significant test coverage additions for night surplus, solar surplus, MQTT publishing, and
+  all new forecast padding paths including DST edge cases.
 
 # 🚀 Release 0.8.0 - Released on 11.05.2026
 
