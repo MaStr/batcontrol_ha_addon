@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.8.0dev1"
+version: "0.8.0dev2"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -44,6 +44,9 @@ options:
     production_offset_percent: 1.0 # Adjust production forecast by a percentage (1.0 = 100%, 0.8 = 80%, etc.)
                                    # Useful for winter mode when solar panels are covered with snow
     preserve_min_grid_charge_soc: false # If true, also preserve min_grid_charge_soc as reserved energy during cheap/pre-expensive slots
+    # market_price_refresh_time: "12:30" # UTC time for a daily hard price refresh.
+    #   Use this to pick up newly published next-day prices (e.g. EPEX Spot ~12:00 UTC).
+    #   Format: "HH:MM". Default: "12:30".
 
   inverter:
     type: dummy #currently only fronius_gen24 supported
@@ -71,6 +74,11 @@ options:
     # zone_2_hours: "0-6,23" # only required for tariff_zones, hours assigned to zone 2 (must cover remaining hours)
     # tariff_zone_3: 0.2100 # optional for tariff_zones, third zone price
     # zone_3_hours: "17-20" # optional for tariff_zones, hours for zone 3 (must not overlap with zone 1 or 2)
+  dynamic_network_fees:
+    enabled: false # Set to true to activate dynamic network fees
+    country: de # Country code: de, at, ch
+    operator: syna # Network operator ID (e.g. syna, westnetz, ggv, ewr-netz)
+    # url: https://dyn-net.batcontrol.software/api/ # Optional: override for self-hosted instance
   solar_forecast_provider: fcsolarapi
   pvinstallations:
     - name: Haus #name
@@ -162,6 +170,7 @@ schema:
     production_offset_percent: float(0,) # Adjust production forecast by a percentage (1.0 = 100%, 0.8 = 80%, etc.)
                                    # Useful for winter mode when solar panels are covered with snow
     preserve_min_grid_charge_soc: bool? # If true, also preserve min_grid_charge_soc as reserved energy during cheap/pre-expensive slots
+    market_price_refresh_time: str? # UTC time "HH:MM" for a daily hard price refresh (default: "12:30")
   inverter:
     type: list(fronius_gen24|fronius-modbus|dummy|mqtt)
     address: str? # the local IP of your inverter. Required for fronius_gen24
@@ -196,6 +205,11 @@ schema:
     zone_2_hours: str? # only required for tariff_zones, hours assigned to zone 2
     tariff_zone_3: float(0,)? # optional for tariff_zones, Euro/kWh incl. vat/fees
     zone_3_hours: str? # optional for tariff_zones, hours assigned to zone 3
+  dynamic_network_fees:
+    enabled: bool? # Enable/disable dynamic network fees (default: false)
+    country: list(de|at|ch)? # Country code
+    operator: str? # Network operator ID (e.g. syna, westnetz, ggv, ewr-netz)
+    url: str? # Optional: override URL for self-hosted instance
   solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar|homeassistant-solar-forecast-ml)?
   pvinstallations:
     - name: str #name
