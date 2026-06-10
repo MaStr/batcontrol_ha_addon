@@ -19,9 +19,9 @@ place the edited load profile in your home assistant instance using below path. 
 Step 4
 Restart the addon
 
-## Wiki
+## Documentation
 
-The Wiki of the underlying project provides further and up-to-date information about the project and its configuration parameters
+The documentation of the underlying project provides further and up-to-date information about the project and its configuration parameters:
 https://mastr.github.io/batcontrol/
 
 ## Configuration Parameters
@@ -65,7 +65,7 @@ Awattar only provides the EPEX Spot prices via the API. So the final price is ca
 
 ### `solar_forecast_provider`:
 
-choose betwween fcsolarapi and solarprognose. Check https://mastr.github.io/batcontrol/configuration/solar-forecast/ for details.
+choose between fcsolarapi and solarprognose. Check https://mastr.github.io/batcontrol/configuration/solar-forecast/ for details.
 
 ### `pvinstallations`:
 
