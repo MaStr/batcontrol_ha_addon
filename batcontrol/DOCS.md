@@ -22,7 +22,7 @@ Restart the addon
 ## Wiki
 
 The Wiki of the underlying project provides further and up-to-date information about the project and its configuration parameters
-https://github.com/MaStr/batcontrol/wiki
+https://mastr.github.io/batcontrol/
 
 ## Configuration Parameters
 
@@ -65,7 +65,7 @@ Awattar only provides the EPEX Spot prices via the API. So the final price is ca
 
 ### `solar_forecast_provider`:
 
-choose betwween fcsolarapi and solarprognose. Check https://github.com/MaStr/batcontrol/wiki/Solar-Forecast for details.
+choose betwween fcsolarapi and solarprognose. Check https://mastr.github.io/batcontrol/configuration/solar-forecast/ for details.
 
 ### `pvinstallations`:
 
