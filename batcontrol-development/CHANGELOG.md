@@ -10,10 +10,15 @@
   Activate via the new top-level `dynamic_network_fees` config block (see config example).
   Providers that already include fees (Tibber, evcc, tariff_zones) are unaffected.
 
-- **Night Surplus Forecast** (#372): New MQTT sensor `night_surplus_wh` - reports how much
-  usable battery energy is expected to remain when the next solar production window begins.
-  Useful for driving flexible loads (heat pump, EV) during the overnight hours before dawn
-  without running the battery flat. Published via MQTT with Home Assistant auto-discovery.
+- **PV Start Battery & Forecast Min Battery** (#372, updated): Two MQTT sensors replace the
+  former `night_surplus_wh` metric (legacy discovery entry is cleaned up automatically):
+  - `pv_start_battery_wh`: battery level in Wh above MIN_SOC at the next net-charging
+    crossover (when PV first exceeds household consumption). 0 means the battery hits MIN_SOC
+    before solar restarts.
+  - `forecast_min_battery_wh`: minimum battery level in Wh above MIN_SOC over the entire
+    forecast horizon (slot-by-slot simulation). 0 means a shortage is expected at some point.
+  Both sensors support Home Assistant MQTT auto-discovery. Useful for driving flexible loads
+  (heat pump, EV, evcc) based on expected overnight battery availability.
 
 - **Solar Surplus and Solar Active MQTT Sensors** (#370): Two new MQTT sensors published after
   each control cycle:
@@ -40,12 +45,25 @@
   allow only 20 API calls per day. The new dedicated interval of ~80 minutes (18 calls/day)
   prevents quota exhaustion while leaving 2 requests in reserve for restarts or transient errors.
 
+- **Inverter Resilient Wrapper Simplified** (#381): The fail-fast/retry logic in the inverter
+  resilient wrapper has been restructured into a cleaner two-tier model: transient
+  communication errors vs. full outage errors. Reduces noise in logs and improves recovery
+  behaviour after short connection interruptions.
+
+- **Docker Image Address Updated** (#375): The Docker image has moved from `muexx/batcontrol`
+  to `mastr950/batcontrol`. Update your `docker run` or `docker-compose.yml` accordingly.
+
+- **Documentation migrated to MkDocs** (#377): The GitHub Wiki has been replaced by a
+  versioned MkDocs documentation site. All configuration references and integration guides
+  are now maintained at https://mastr.github.io/batcontrol/.
+
 ### Internal Changes
 
 - Added `CLAUDE.md` developer documentation to the batcontrol repository with architecture
   notes, module map, testing conventions, and known pitfalls for development sessions.
-- Significant test coverage additions for night surplus, solar surplus, MQTT publishing, and
-  all new forecast padding paths including DST edge cases.
+- Significant test coverage additions for PV battery metrics, solar surplus, MQTT publishing,
+  and all new forecast padding paths including DST edge cases.
+- evcc product name aligned to lowercase throughout code and documentation.
 
 # 🚀 Release 0.8.0 - Released on 11.05.2026
 
@@ -100,9 +118,9 @@
 
 👉 [GitHub Release v0.8.0](https://github.com/MaStr/batcontrol/releases/tag/0.8.0)
 
-### 📚 Wiki
+### 📚 Docs
 
-👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki)
+👉 [Documentation](https://mastr.github.io/batcontrol/)
 
 
 # 🚀 Release 0.7.2 - Released on 07.04.2026
@@ -117,9 +135,9 @@
 
 👉 [GitHub Release v0.7.2](https://github.com/MaStr/batcontrol/releases/tag/0.7.2) 
 
-### 📚 Wiki
+### 📚 Docs
 
-👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) 
+👉 [Documentation](https://mastr.github.io/batcontrol/) 
 
 
 # 🚀 Release 0.7.1 - Released on 17.03.2026
@@ -135,7 +153,7 @@
 
 👉 [GitHub Release v0.7.1](https://github.com/MaStr/batcontrol/releases/tag/0.7.1) 
 
-### 📚 Wiki
+### 📚 Docs
 
-👉 [Project Wiki](https://github.com/MaStr/batcontrol/wiki) 
+👉 [Documentation](https://mastr.github.io/batcontrol/) 
 
