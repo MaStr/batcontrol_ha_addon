@@ -49,8 +49,12 @@ options change without a version bump is invisible to users.
 - Validate YAML after editing: `python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))" <file>`.
   CI runs the official HA add-on linter on every add-on directory.
 
-## Porting upstream changes
+## Skills
 
-Use the `port-batcontrol-change` skill (`.claude/skills/port-batcontrol-change/SKILL.md`) —
-it walks through diffing the upstream reference config, updating `options:`/`schema:`,
-DOCS.md, CHANGELOG.md, translations, and the version bump.
+- `port-batcontrol-change` (`.claude/skills/port-batcontrol-change/SKILL.md`): port a single
+  upstream change — diff the upstream reference config, update `options:`/`schema:`, DOCS.md,
+  CHANGELOG.md, translations, bump the dev version.
+- `release-addon` (`.claude/skills/release-addon/SKILL.md`): promote a published upstream
+  release into the stable add-on (sync from development, set `version` to the release tag,
+  write the release CHANGELOG section) and open the next `devN` cycle in
+  `batcontrol-development/`.
