@@ -9,6 +9,12 @@ user documentation. The Python source lives in the upstream `batcontrol` repo.
 ```
 repository.yaml               # HA add-on repository manifest (name, url, maintainer)
 batcontrol/                   # STABLE add-on ("Batcontrol-next")
+  config.yaml                 # Add-on manifest: name/version/slug + options: + schema:
+  Dockerfile                  # Image build; BUILD_VERSION is taken from config.yaml version
+  DOCS.md                     # User-facing parameter docs shown in the HA UI
+  CHANGELOG.md                # Shown in the HA UI on update
+  translations/en.yaml        # Names/descriptions of option groups in the HA config UI
+  build.yaml                  # Base images per architecture
 batcontrol-development/       # DEVELOPMENT add-on ("Batcontrol-development")
 .github/workflows/lint.yaml   # frenck/action-addon-linter over every add-on dir
 
