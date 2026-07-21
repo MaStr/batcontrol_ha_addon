@@ -65,6 +65,17 @@
   and all new forecast padding paths including DST edge cases.
 - evcc product name aligned to lowercase throughout code and documentation.
 
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.8.0...0.8.1
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.8.1](https://github.com/MaStr/batcontrol/releases/tag/0.8.1)
+
+### 📚 Documentation
+
+👉 [Project Documentation](https://mastr.github.io/batcontrol/)
+
+
 # 🚀 Release 0.8.0 - Released on 11.05.2026
 
 ## What's Changed
