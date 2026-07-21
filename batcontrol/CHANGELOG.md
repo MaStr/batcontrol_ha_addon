@@ -1,3 +1,70 @@
+# Release 0.8.1 - Released on 21.07.2026
+
+## What's Changed
+
+### New Features
+
+- **Dynamic Network Fees - Section 14a EnWG** (#364): Adds time-variable network fee surcharges
+  to energy prices for providers that calculate fees locally (Awattar, Energyforecast). Fees are
+  sourced from `dyn-net.batcontrol.software`, cached for 12 hours, and applied net before VAT.
+  Activate via the new top-level `dynamic_network_fees` config block (see config example).
+  Providers that already include fees (Tibber, evcc, tariff_zones) are unaffected.
+
+- **PV Start Battery & Forecast Min Battery** (#372, updated): Two MQTT sensors replace the
+  former `night_surplus_wh` metric (legacy discovery entry is cleaned up automatically):
+  - `pv_start_battery_wh`: battery level in Wh above MIN_SOC at the next net-charging
+    crossover (when PV first exceeds household consumption). 0 means the battery hits MIN_SOC
+    before solar restarts.
+  - `forecast_min_battery_wh`: minimum battery level in Wh above MIN_SOC over the entire
+    forecast horizon (slot-by-slot simulation). 0 means a shortage is expected at some point.
+  Both sensors support Home Assistant MQTT auto-discovery. Useful for driving flexible loads
+  (heat pump, EV, evcc) based on expected overnight battery availability.
+
+- **Solar Surplus and Solar Active MQTT Sensors** (#370): Two new MQTT sensors published after
+  each control cycle:
+  - `solar_surplus_wh`: expected usable solar surplus in Wh for the current/next production window
+  - `solar_active`: binary sensor (`true`/`false`) indicating whether solar production is currently active
+  Both are available via Home Assistant MQTT auto-discovery.
+
+### Enhancements
+
+- **Solar Forecast Padded to Midnight** (#373): Solar forecast providers (e.g. FCSolar,
+  SolarPrognose) often stop returning data at the last production interval (e.g. 21:00), leaving
+  the rest of the day uncovered. batcontrol now pads the forecast with zero-production entries
+  up to midnight, extending the effective planning horizon by up to 3 hours. DST transitions
+  are handled correctly.
+
+- **Configurable Daily Market Price Hard Refresh** (#367): EPEX Spot next-day prices are
+  typically published around 12:00-13:00 UTC. The normal hourly polling could miss these for
+  an extended time. A dedicated daily hard refresh now bypasses the cache and fetches fresh
+  price data at a configurable UTC time. Configure via `battery_control_expert.market_price_refresh_time`
+  (default: `"12:30"`). Applies to all dynamic tariff providers.
+
+- **Solar API Rate Limit Protection** (#369): The solar forecast refresh interval is now set
+  independently from the general API call interval. Providers such as FCSolar and SolarPrognose
+  allow only 20 API calls per day. The new dedicated interval of ~80 minutes (18 calls/day)
+  prevents quota exhaustion while leaving 2 requests in reserve for restarts or transient errors.
+
+- **Inverter Resilient Wrapper Simplified** (#381): The fail-fast/retry logic in the inverter
+  resilient wrapper has been restructured into a cleaner two-tier model: transient
+  communication errors vs. full outage errors. Reduces noise in logs and improves recovery
+  behaviour after short connection interruptions.
+
+- **Docker Image Address Updated** (#375): The Docker image has moved from `muexx/batcontrol`
+  to `mastr950/batcontrol`. Update your `docker run` or `docker-compose.yml` accordingly.
+
+- **Documentation migrated to MkDocs** (#377): The GitHub Wiki has been replaced by a
+  versioned MkDocs documentation site. All configuration references and integration guides
+  are now maintained at https://mastr.github.io/batcontrol/.
+
+### Internal Changes
+
+- Added `CLAUDE.md` developer documentation to the batcontrol repository with architecture
+  notes, module map, testing conventions, and known pitfalls for development sessions.
+- Significant test coverage additions for PV battery metrics, solar surplus, MQTT publishing,
+  and all new forecast padding paths including DST edge cases.
+- evcc product name aligned to lowercase throughout code and documentation.
+
 # 🚀 Release 0.8.0 - Released on 11.05.2026
 
 ## What's Changed
