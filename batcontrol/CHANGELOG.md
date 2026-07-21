@@ -57,13 +57,28 @@
   versioned MkDocs documentation site. All configuration references and integration guides
   are now maintained at https://mastr.github.io/batcontrol/.
 
-### Internal Changes
+### Documentation
 
-- Added `CLAUDE.md` developer documentation to the batcontrol repository with architecture
-  notes, module map, testing conventions, and known pitfalls for development sessions.
-- Significant test coverage additions for PV battery metrics, solar surplus, MQTT publishing,
-  and all new forecast padding paths including DST edge cases.
-- evcc product name aligned to lowercase throughout code and documentation.
+- **Documentation inaccuracies corrected** (#378): Several wrong defaults and missing topics in
+  the docs have been fixed based on a systematic code review. Key corrections:
+  - `enable_resilient_wrapper` default is `false`, not `true`
+  - `max_charging_from_grid_limit` default is `80%`, not `89%`
+  - `history_weights` uses semicolons (`"1;1;1"`), not commas — a comma-separated value would
+    crash parsing
+  - MQTT/evcc TLS support is marked as non-functional (contradictory code paths) rather than
+    merely untested
+  - A number of MQTT topics that existed in the code but were absent from the docs are now
+    documented: `min_grid_charge_soc`, `limit_battery_charge_rate`, `production_offset`,
+    `api_override_active`, `control_source`, `solar_surplus_wh`, `solar_active`,
+    `night_surplus_wh`, `peak_shaving/*`, and their `/set` counterparts
+
+- **README rewritten and installation guide added** (#386): The README is now a concise project
+  overview. Detailed installation steps, a pre-flight checklist, and next-steps guidance live in
+  the new `docs/getting-started/installation.md` page on the docs site.
+
+- **LLM-friendly docs** (#387): The docs site now generates `/llms.txt` and `/llms-full.txt`
+  at build time, making the full documentation accessible to AI assistants and LLM tools.
+
 
 **Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.8.0...0.8.1
 
