@@ -1,8 +1,65 @@
-# Release 0.9.0 - in development
+# Release 0.9.0 - in Development
 
 ## What's Changed
 
-# Release 0.8.1 - Released on 21.07.2026
+### New Features
+
+- **Solcast Rooftop API as Solar Forecast Provider**: Solcast (https://solcast.com) is now
+  supported as a solar forecast provider with native 30-minute resolution. The free hobbyist
+  account grants 10 API calls per day; batcontrol scales the refresh interval automatically
+  with the number of configured installations so the quota is never exceeded. Rate-limit
+  responses (HTTP 429) are handled via the `Retry-After` header. Configuration requires only
+  `resource_id` and `apikey` per site — the panel geometry (tilt, azimuth, capacity) is
+  managed in the Solcast web toolkit. Optional `percentile` selection (10/50/90, default 50)
+  allows choosing between optimistic, median, and conservative forecasts.
+
+- **Forecast Grid Charge Target Strategy**: A new `battery_control.grid_charge_target_strategy`
+  option controls how `min_grid_charge_soc` is applied during expensive price slots. Set to
+  `forecast` to let batcontrol compute the effective target SoC dynamically based on the
+  expected overnight battery reserve (using the solar forecast), rather than always charging
+  to the fixed configured value. The effective target is published to MQTT as
+  `effective_min_grid_charge_soc`. The default value `fixed` retains the existing behaviour.
+  Thanks to @filiplajszczak
+
+### Bug Fixes
+
+- **MQTT and evcc TLS/SSL Support Fixed** (#397): TLS connections for both the MQTT API and the
+  evcc plugin were completely non-functional since their introduction. The code checked
+  `config['tls'] is True` but then tried to index the same boolean as a dictionary, causing a
+  `TypeError` at connection time. The fix reads `cafile`, `certfile`, and `keyfile` from the
+  flat config keys where they actually live. TLS config is now validated at startup: if
+  `tls: true` is set without a `cafile`, or if `certfile`/`keyfile` are only partially
+  provided, batcontrol raises a clear `ValueError` instead of failing silently at connect time.
+  The defunct `tls_version` and `cert_reqs` config keys have been removed from the example config.
+
+### Removed
+
+- **SolarPrognose provider removed** (#391): SolarPrognose (solarprognose.de) has been
+  discontinued. The provider module, factory entry, and all documentation references have been
+  removed. Users who relied on SolarPrognose should migrate to an alternative forecast provider
+  such as FCSolar, Forecast.Solar, or the newly added Solcast.
+
+### Configuration Changes
+
+- **Resilient Inverter Wrapper enabled by default** (#399): The `enable_resilient_wrapper`
+  option now defaults to `true`. The resilient wrapper retries failed inverter commands and
+  suppresses transient communication errors so batcontrol keeps running through short inverter
+  outages. Existing configs that explicitly set `enable_resilient_wrapper: false` are unaffected.
+
+### Internal Changes
+
+- UTC-aware clock handling in the Solcast provider ensures correct hour-alignment independent
+  of the host timezone.
+- Network-level exceptions (timeouts, DNS failures) in the Solcast provider are wrapped as
+  `ProviderError` so the refresh scheduler falls back to cached data instead of crashing.
+- Documentation deployment workflow now triggers on tag pushes in addition to branch pushes.
+- CLAUDE.md expanded with CLI reference (`--one-shot` flag), release skill documentation, and
+  HA add-on sync notes.
+- Fronius GEN24 inverter integration documented: required access level (customer/technician),
+  Solar.API activation on each startup, and battery/time-of-use config backup/restore behaviour
+  on clean shutdown. (#400, closes #74)
+
+# Release 0.8.1 - Released on 2026-07-21
 
 ## What's Changed
 

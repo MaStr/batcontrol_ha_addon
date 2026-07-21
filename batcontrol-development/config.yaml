@@ -28,6 +28,7 @@ options:
     always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     # min_grid_charge_soc: 0.55        # optional 0.00 to 1.00 target to preserve/charge before expensive slots
+    # grid_charge_target_strategy: fixed # fixed = use min_grid_charge_soc unchanged; forecast = keep it as reserve after expensive slots
     min_recharge_amount: 100 # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: false
@@ -58,7 +59,7 @@ options:
     max_grid_charge_rate: 5000 # Watt
     fronius_inverter_id: "1" # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: "0" # Optional: ID of the controller in Fronius API (default: '0')
-    # enable_resilient_wrapper: false # Optional: Enable resilient wrapper for graceful outage handling (default: false)
+    # enable_resilient_wrapper: true # Optional: Enable resilient wrapper for graceful outage handling (default: true)
     # outage_tolerance_minutes: 24 # Optional: Minutes to tolerate inverter outages before terminating (default: 24)
     # retry_backoff_seconds: 60 # Optional: Seconds to wait before retrying after failure (default: 60)
   utility:
@@ -120,7 +121,6 @@ options:
     cafile: /ssl/certs/ca-certificates.crt
     certfile: /ssl/certs/client.crt
     keyfile: /ssl/certs/client.key
-    tls_version: tlsv1.2
     auto_discover_enable: true
     auto_discover_topic: homeassistant
 
@@ -140,7 +140,6 @@ options:
     cafile: /ssl/certs/ca-certificates.crt
     certfile: /ssl/certs/client.crt
     keyfile: /ssl/certs/client.key
-    tls_version: tlsv1.2
 schema:
   timezone: str #your time zone. not optional.
   time_resolution_minutes: list(15|60) # Time resolution for forecasts: 15 (quarter-hourly) or 60 (hourly).
@@ -154,6 +153,7 @@ schema:
     always_allow_discharge_limit: float(0,1) # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: float(0,1) # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     min_grid_charge_soc: float(0,1)? # optional 0.00 to 1.00 target to preserve/charge before expensive slots
+    grid_charge_target_strategy: list(fixed|forecast)? # fixed = use min_grid_charge_soc unchanged; forecast = dynamic reserve (default: fixed)
     min_recharge_amount: int(0,)? # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: bool? # Enable/disable peak shaving (default: false)
@@ -189,7 +189,7 @@ schema:
     revert_seconds: int(0,)? # (fronius-modbus) seconds before reverting to default mode (default: 0)
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
-    enable_resilient_wrapper: bool? # Enable resilient wrapper for graceful outage handling (default: false)
+    enable_resilient_wrapper: bool? # Enable resilient wrapper for graceful outage handling (default: true)
     outage_tolerance_minutes: int(1,)? # Minutes to tolerate inverter outages before terminating (default: 24)
     retry_backoff_seconds: int(1,)? # Seconds to wait before retrying after failure (default: 60)
   utility:
@@ -210,7 +210,7 @@ schema:
     country: list(de|at|ch)? # Country code
     operator: str? # Network operator ID (e.g. syna, westnetz, ggv, ewr-netz)
     url: str? # Optional: override URL for self-hosted instance
-  solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar|homeassistant-solar-forecast-ml)?
+  solar_forecast_provider: list(fcsolarapi|solcast|evcc-solar|homeassistant-solar-forecast-ml)?
   pvinstallations:
     - name: str #name
       lat: float(,90)?
@@ -219,11 +219,10 @@ schema:
       azimuth: float(,180)? # -90:East, 0:South, 90:West -180..180
       kWp: float(0,)? # power in kWp
       url: str? # only required for evcc-solar
-      apikey: str? #forecastsolarapi
-      algorithm: str? #solarprognose
-      item: str? #solarprognose
-      token: str? #solarprognose
-      horizon: str? #forecastsolarapi horizon modifier
+      apikey: str? # forecastsolarapi
+      horizon: str? # forecastsolarapi horizon modifier
+      resource_id: str? # solcast: rooftop site resource ID
+      percentile: list(10|50|90)? # solcast: forecast percentile (default: 50)
       base_url: str? # homeassistant-solar-forecast-ml: HomeAssistant WebSocket URL
       api_token: str? # homeassistant-solar-forecast-ml: Long-lived access token
       entity_id: str? # homeassistant-solar-forecast-ml: Forecast sensor entity ID
@@ -255,7 +254,6 @@ schema:
     cafile: str?
     certfile: str?
     keyfile: str?
-    tls_version: list(tlsv1.2|tlsv1.3)?
     auto_discover_enable: bool?
     auto_discover_topic: str?
 
@@ -275,4 +273,3 @@ schema:
     cafile: str?
     certfile: str?
     keyfile: str?
-    tls_version: list(tlsv1.2|tlsv1.3)?
