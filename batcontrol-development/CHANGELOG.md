@@ -4,6 +4,17 @@
 
 ### New Features
 
+- **Fronius GEN24: Optional Fixed Battery Capacity**: The `fronius_gen24` inverter type now
+  accepts an optional `capacity` key (in Wh). When set, batcontrol uses this fixed value instead
+  of querying `DesignedCapacity` from the inverter's Solar API at startup. Useful for setups where
+  the API reports an incorrect capacity. Non-finite or non-numeric values are rejected at startup.
+
+- **Energyforecast Total Price Provider** (#371): New `energyforecast_total_price` provider type
+  uses the API-computed `total_ct_kwh` field directly, which already includes dynamic network fees,
+  VAT, and markup as calculated by energyforecast.de. The `vat`, `fees`, and `markup` config fields
+  are not required and `dynamic_network_fees` must not be enabled alongside this type (the API
+  already includes network fees in its total).
+
 - **Solcast Rooftop API as Solar Forecast Provider**: Solcast (https://solcast.com) is now
   supported as a solar forecast provider with native 30-minute resolution. The free hobbyist
   account grants 10 API calls per day; batcontrol scales the refresh interval automatically
@@ -40,6 +51,14 @@
   such as FCSolar, Forecast.Solar, or the newly added Solcast.
 
 ### Configuration Changes
+
+- **Energyforecast migrated to API v2** (#371, closes #365): The energyforecast provider now uses
+  the `/api/v2/forecast` endpoint. Data is always quarter-hourly (15-min native resolution),
+  multi-day forecasts are returned natively, and a minimum 4-hour refresh interval is enforced.
+  A new optional `market_zone` config key (default: `DE`) selects the price zone; `DE` and `LU`
+  are both normalized to `DE-LU` for the API (supported zones: DE, LU, AT, FR, NL, BE, PL, DK1,
+  DK2). The `energyforecast_96` provider type has been **removed** from the add-on — migrate to
+  `energyforecast`, which now provides equivalent multi-day coverage via API v2.
 
 - **Resilient Inverter Wrapper enabled by default** (#399): The `enable_resilient_wrapper`
   option now defaults to `true`. The resilient wrapper retries failed inverter commands and
