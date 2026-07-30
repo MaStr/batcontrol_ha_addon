@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.9.0dev2"
+version: "0.9.0dev3"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -32,9 +32,15 @@ options:
     min_recharge_amount: 100 # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: false
-    mode: combined # 'time' | 'price' | 'combined' - algorithm mode
-    allow_full_battery_after: 14 # Hour (0-23) - battery should be full by this hour
-    price_limit: 0.05 # Euro/kWh - slots at or below this price are "cheap"
+    time_active: true # target-time rule: spread charging until allow_full_battery_after
+    price_active: true # price rule: reserve capacity for cheap-price PV windows
+    solar_cap_active: false # solar feed-in limit rule: absorb PV power above feed_in_limit_w
+    allow_full_battery_after: 14 # Hour (0-23) - battery should be full by this hour (time rule)
+    price_limit: 0.05 # Euro/kWh - cheap-slot threshold (price rule); -1 disables the price rule component
+    feed_in_limit_w: 0 # Watt - grid feed-in power limit (solar rule). 0 = neutral/off.
+                       # German Solarspitzengesetz: 60% of installed power, e.g. 0.6 * kWp * 1000
+    feed_in_limit_headroom: 1.0 # Safety factor >= 1.0 on the forecast surplus (solar rule); 1.1 if curtailment is observed
+    # mode: combined # DEPRECATED - 'time'|'price'|'combined', mapped onto the switches above (logs a warning)
   battery_control_expert:
     charge_rate_multiplier: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
@@ -158,9 +164,14 @@ schema:
     min_recharge_amount: int(0,)? # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: bool? # Enable/disable peak shaving (default: false)
-    mode: list(time|price|combined)? # Algorithm mode (default: combined)
+    time_active: bool? # target-time rule switch (default: true)
+    price_active: bool? # price rule switch (default: true)
+    solar_cap_active: bool? # solar feed-in limit rule switch (default: false)
     allow_full_battery_after: int(0,23)? # Hour (0-23) - battery should be full by this hour (default: 14)
-    price_limit: float? # Euro/kWh - cheap-price threshold. Required for modes 'price' and 'combined'
+    price_limit: float? # Euro/kWh - cheap-price threshold, used when price_active is true
+    feed_in_limit_w: float(0,)? # Watt - grid feed-in power limit for the solar rule (default: 0 = neutral)
+    feed_in_limit_headroom: float(1,)? # Safety factor >= 1.0 on forecast surplus for the solar rule (default: 1.0)
+    mode: list(time|price|combined)? # DEPRECATED: mapped onto the switches above at load time (logs a warning)
   battery_control_expert:
     charge_rate_multiplier: float(0,) # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:

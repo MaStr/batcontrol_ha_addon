@@ -32,6 +32,19 @@
   `effective_min_grid_charge_soc`. The default value `fixed` retains the existing behaviour.
   Thanks to @filiplajszczak
 
+- **Peak Shaving: Solar Feed-In Limit / Solarspitzengesetz Clip Absorption** (#405): New
+  per-rule switches `time_active`, `price_active`, and `solar_cap_active` replace the single
+  `peak_shaving.mode` setting (still accepted but **deprecated** — a startup warning is logged
+  and it is mapped onto the switches: `time` -> `time_active` only, `price` -> `price_active`
+  only, `combined` -> both). The new `solar_cap_active` rule absorbs PV power above a
+  configurable `feed_in_limit_w` (the German 60% feed-in cap for uncontrolled plants, e.g.
+  `0.6 * kWp * 1000`) into the battery instead of losing it to inverter curtailment.
+  `feed_in_limit_headroom` (default `1.0`, must be `>= 1.0`) adds a safety margin to the
+  forecast surplus for sites where clear-day production is underestimated. The solar floor
+  takes priority over all other caps — including past `allow_full_battery_after` and at high
+  SoC — because clipped energy is otherwise lost outright. Do not use
+  `battery_control_expert.production_offset_percent` as a substitute for the headroom setting.
+
 ### Bug Fixes
 
 - **MQTT and evcc TLS/SSL Support Fixed** (#397): TLS connections for both the MQTT API and the
@@ -42,6 +55,20 @@
   `tls: true` is set without a `cafile`, or if `certfile`/`keyfile` are only partially
   provided, batcontrol raises a clear `ValueError` instead of failing silently at connect time.
   The defunct `tls_version` and `cert_reqs` config keys have been removed from the example config.
+
+- **evcc: Missing 15-Minute Slots on Mixed-Granularity Price Entries** (#406): evcc sometimes
+  returns hourly-width rate entries further out in the forecast horizon while near-term prices
+  are 15-minute slots. batcontrol only filled the entry's start slot, leaving the remaining
+  15-minute slots of an hourly entry missing from the price data — this crashed batcontrol with
+  an uncaught `KeyError` when it hit the gap. Every 15-minute slot actually covered by a rate
+  entry is now filled.
+
+- **MQTT Forecast Topics 4x Too Low at 15-Minute Resolution** (#407): `FCST/production`,
+  `FCST/consumption`, and `FCST/net_consumption` were documented as Watts but published the raw
+  Wh-per-interval value, which only matches average power at 60-minute resolution — at
+  15-minute resolution the published number was 4x too low. `value` now stays Wh-per-interval
+  (unchanged regardless of resolution) and a new `power_w` field carries the average power in
+  Watts.
 
 ### Removed
 
