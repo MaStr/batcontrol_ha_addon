@@ -24,6 +24,9 @@ Restart the addon
 The documentation of the underlying project provides further and up-to-date information about the project and its configuration parameters:
 https://mastr.github.io/batcontrol/
 
+Since this add-on tracks the upstream `main` branch, the development documentation may be more accurate:
+https://mastr.github.io/batcontrol-dev/
+
 ## Configuration Parameters
 
 `timezone:` Europe/Berlin your time zone. not optional.
