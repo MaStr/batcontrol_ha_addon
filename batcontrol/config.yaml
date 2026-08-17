@@ -1,6 +1,6 @@
 name: "Batcontrol-next"
 description: "Controls the charging of the battery."
-version: "0.8.1"
+version: "0.9.0"
 slug: "batcontrol"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -28,12 +28,19 @@ options:
     always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     # min_grid_charge_soc: 0.55        # optional 0.00 to 1.00 target to preserve/charge before expensive slots
+    # grid_charge_target_strategy: fixed # fixed = use min_grid_charge_soc unchanged; forecast = keep it as reserve after expensive slots
     min_recharge_amount: 100 # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: false
-    mode: combined # 'time' | 'price' | 'combined' - algorithm mode
-    allow_full_battery_after: 14 # Hour (0-23) - battery should be full by this hour
-    price_limit: 0.05 # Euro/kWh - slots at or below this price are "cheap"
+    time_active: true # target-time rule: spread charging until allow_full_battery_after
+    price_active: true # price rule: reserve capacity for cheap-price PV windows
+    solar_cap_active: false # solar feed-in limit rule: absorb PV power above feed_in_limit_w
+    allow_full_battery_after: 14 # Hour (0-23) - battery should be full by this hour (time rule)
+    price_limit: 0.05 # Euro/kWh - cheap-slot threshold (price rule); -1 disables the price rule component
+    feed_in_limit_w: 0 # Watt - grid feed-in power limit (solar rule). 0 = neutral/off.
+                       # German Solarspitzengesetz: 60% of installed power, e.g. 0.6 * kWp * 1000
+    feed_in_limit_headroom: 1.0 # Safety factor >= 1.0 on the forecast surplus (solar rule); 1.1 if curtailment is observed
+    # mode: combined # DEPRECATED - 'time'|'price'|'combined', mapped onto the switches above (logs a warning)
   battery_control_expert:
     charge_rate_multiplier: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
@@ -58,12 +65,13 @@ options:
     max_grid_charge_rate: 5000 # Watt
     fronius_inverter_id: "1" # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: "0" # Optional: ID of the controller in Fronius API (default: '0')
-    # enable_resilient_wrapper: false # Optional: Enable resilient wrapper for graceful outage handling (default: false)
+    # enable_resilient_wrapper: true # Optional: Enable resilient wrapper for graceful outage handling (default: true)
     # outage_tolerance_minutes: 24 # Optional: Minutes to tolerate inverter outages before terminating (default: 24)
     # retry_backoff_seconds: 60 # Optional: Seconds to wait before retrying after failure (default: 60)
   utility:
-    type: awattar_de #tibber, awattar_at, awattar_de, evcc, energyforecast, energyforecast_96, tariff_zones
-    apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber & energyforecast
+    type: awattar_de #tibber, awattar_at, awattar_de, evcc, energyforecast, energyforecast_total_price, tariff_zones
+    apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber, energyforecast, energyforecast_total_price
+    # market_zone: DE # optional for energyforecast/energyforecast_total_price: DE/LU (both -> DE-LU, default), AT, FR, NL, BE, PL, DK1, DK2
     url: http://evcc.local:7070/api/tariff/grid # only required for evcc
     vat: 0.19 # only required for awattar and energyforecast
     fees: 0.015 # only required for awattar and energyforecast
@@ -120,9 +128,9 @@ options:
     cafile: /ssl/certs/ca-certificates.crt
     certfile: /ssl/certs/client.crt
     keyfile: /ssl/certs/client.key
-    tls_version: tlsv1.2
     auto_discover_enable: true
     auto_discover_topic: homeassistant
+    # grid_charge_lock_topic: hems/batcontrol/grid_charge_lock # optional: absolute external MQTT topic for a HEMS/grid-operator grid-charge lock signal (section 14a EnWG)
 
   evcc:
     enabled: false
@@ -140,7 +148,6 @@ options:
     cafile: /ssl/certs/ca-certificates.crt
     certfile: /ssl/certs/client.crt
     keyfile: /ssl/certs/client.key
-    tls_version: tlsv1.2
 schema:
   timezone: str #your time zone. not optional.
   time_resolution_minutes: list(15|60) # Time resolution for forecasts: 15 (quarter-hourly) or 60 (hourly).
@@ -154,12 +161,18 @@ schema:
     always_allow_discharge_limit: float(0,1) # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
     max_charging_from_grid_limit: float(0,1) # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     min_grid_charge_soc: float(0,1)? # optional 0.00 to 1.00 target to preserve/charge before expensive slots
+    grid_charge_target_strategy: list(fixed|forecast)? # fixed = use min_grid_charge_soc unchanged; forecast = dynamic reserve (default: fixed)
     min_recharge_amount: int(0,)? # in Wh, start & minimum amount of energy to recharge the battery
   peak_shaving:
     enabled: bool? # Enable/disable peak shaving (default: false)
-    mode: list(time|price|combined)? # Algorithm mode (default: combined)
+    time_active: bool? # target-time rule switch (default: true)
+    price_active: bool? # price rule switch (default: true)
+    solar_cap_active: bool? # solar feed-in limit rule switch (default: false)
     allow_full_battery_after: int(0,23)? # Hour (0-23) - battery should be full by this hour (default: 14)
-    price_limit: float? # Euro/kWh - cheap-price threshold. Required for modes 'price' and 'combined'
+    price_limit: float? # Euro/kWh - cheap-price threshold, used when price_active is true
+    feed_in_limit_w: float(0,)? # Watt - grid feed-in power limit for the solar rule (default: 0 = neutral)
+    feed_in_limit_headroom: float(1,)? # Safety factor >= 1.0 on forecast surplus for the solar rule (default: 1.0)
+    mode: list(time|price|combined)? # DEPRECATED: mapped onto the switches above at load time (logs a warning)
   battery_control_expert:
     charge_rate_multiplier: float(0,) # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
@@ -176,7 +189,7 @@ schema:
     address: str? # the local IP of your inverter. Required for fronius_gen24
     user: list(customer|technician)? # Required for fronius_gen24
     password: password?
-    capacity: int(0,)? # (MQTT)  Battery capacity in Wh, required for mqtt
+    capacity: int(0,)? # Battery capacity in Wh: required for mqtt, optional for fronius_gen24 (overrides DesignedCapacity)
     min_soc: int(0,100)? # (MQTT) Minimum SoC %, optional for mqtt (default: 5)
     max_soc: int(0,100)? # (MQTT)  Maximum SoC %, optional for mqtt (default: 100)
     cache_ttl: int(0,)? # (MQTT)  Cache TTL for SOC values in seconds, optional for mqtt (default: 120)
@@ -189,12 +202,13 @@ schema:
     revert_seconds: int(0,)? # (fronius-modbus) seconds before reverting to default mode (default: 0)
     fronius_inverter_id: str? # Optional: ID of the inverter in Fronius API (default: '1')
     fronius_controller_id: str? # Optional: ID of the controller in Fronius API (default: '0')
-    enable_resilient_wrapper: bool? # Enable resilient wrapper for graceful outage handling (default: false)
+    enable_resilient_wrapper: bool? # Enable resilient wrapper for graceful outage handling (default: true)
     outage_tolerance_minutes: int(1,)? # Minutes to tolerate inverter outages before terminating (default: 24)
     retry_backoff_seconds: int(1,)? # Seconds to wait before retrying after failure (default: 60)
   utility:
-    type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_96|tariff_zones)
-    apikey: password? # only required for tibber & energyforecast
+    type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_total_price|tariff_zones)
+    apikey: password? # only required for tibber, energyforecast, energyforecast_total_price
+    market_zone: str? # optional for energyforecast/energyforecast_total_price (default: DE; DE/LU -> DE-LU)
     url: str? # only required for evcc
     vat: float(0,10)? # only required for awattar and energyforecast
     fees: float(0,10)? # only required for awattar and energyforecast
@@ -210,7 +224,7 @@ schema:
     country: list(de|at|ch)? # Country code
     operator: str? # Network operator ID (e.g. syna, westnetz, ggv, ewr-netz)
     url: str? # Optional: override URL for self-hosted instance
-  solar_forecast_provider: list(fcsolarapi|solarprognose|evcc-solar|homeassistant-solar-forecast-ml)?
+  solar_forecast_provider: list(fcsolarapi|solcast|evcc-solar|homeassistant-solar-forecast-ml)?
   pvinstallations:
     - name: str #name
       lat: float(,90)?
@@ -219,11 +233,10 @@ schema:
       azimuth: float(,180)? # -90:East, 0:South, 90:West -180..180
       kWp: float(0,)? # power in kWp
       url: str? # only required for evcc-solar
-      apikey: str? #forecastsolarapi
-      algorithm: str? #solarprognose
-      item: str? #solarprognose
-      token: str? #solarprognose
-      horizon: str? #forecastsolarapi horizon modifier
+      apikey: str? # forecastsolarapi
+      horizon: str? # forecastsolarapi horizon modifier
+      resource_id: str? # solcast: rooftop site resource ID
+      percentile: list(10|50|90)? # solcast: forecast percentile (default: 50)
       base_url: str? # homeassistant-solar-forecast-ml: HomeAssistant WebSocket URL
       api_token: str? # homeassistant-solar-forecast-ml: Long-lived access token
       entity_id: str? # homeassistant-solar-forecast-ml: Forecast sensor entity ID
@@ -255,9 +268,9 @@ schema:
     cafile: str?
     certfile: str?
     keyfile: str?
-    tls_version: list(tlsv1.2|tlsv1.3)?
     auto_discover_enable: bool?
     auto_discover_topic: str?
+    grid_charge_lock_topic: str? # optional: absolute external MQTT topic for a HEMS/grid-operator grid-charge lock signal (section 14a EnWG)
 
   evcc:
     enabled: bool
@@ -275,4 +288,3 @@ schema:
     cafile: str?
     certfile: str?
     keyfile: str?
-    tls_version: list(tlsv1.2|tlsv1.3)?
