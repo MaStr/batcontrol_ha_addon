@@ -105,6 +105,7 @@ Enables publishing of battery status and control messages via MQTT and integrate
 `tls_version`: tlsv1.2 # TLS version (default: tlsv1.2)
 `auto_discover_enable`: true / false # enable MQTT discovery for Home Assistant
 `auto_discover_topic`: homeassistant # base topic for Home Assistant discovery messages
+`grid_charge_lock_topic`: hems/batcontrol/grid_charge_lock # optional: absolute topic (not nested below `topic`) for an external HEMS/grid-operator grid-charge lock signal (section 14a EnWG), mirrors evcc's "External Limit". Payload `1`/`true` blocks charging from the grid immediately, `0`/`false` (default) restores the previous limit.
 
 ### `evcc`:
 
