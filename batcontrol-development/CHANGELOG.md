@@ -45,6 +45,20 @@
   SoC — because clipped energy is otherwise lost outright. Do not use
   `battery_control_expert.production_offset_percent` as a substitute for the headroom setting.
 
+- **External Grid-Charge Lock Signal / Section 14a EnWG** (#416, closes #216): New optional
+  `mqtt.grid_charge_lock_topic` config key (an absolute topic, not nested below the base MQTT
+  `topic` — mirrors evcc's "External Limit" convention) lets an external HEMS or grid-operator
+  system, such as a German section 14a EnWG controllable-consumption-device signal, tell
+  batcontrol to stop charging the battery from the grid. A payload of `1`/`true`
+  (case-insensitive) immediately blocks grid charging: the current
+  `max_charging_from_grid_limit` is remembered, forced to 0, and any active forced grid charge
+  is cancelled. `0`/`false` (the default) restores the remembered limit, clamped to
+  `always_allow_discharge_limit` so a limit lowered while locked cannot get stuck at 0.
+  batcontrol publishes the lock state as a new retained `house/batcontrol/grid_charge_locked`
+  MQTT topic, with a matching Home Assistant MQTT auto-discovery `binary_sensor` entity
+  ("Grid Charge Locked"). The key is commented out by default in the reference config and is
+  fully backward compatible.
+
 ### Bug Fixes
 
 - **MQTT and evcc TLS/SSL Support Fixed** (#397): TLS connections for both the MQTT API and the

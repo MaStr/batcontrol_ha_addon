@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.9.0dev3"
+version: "0.9.0dev4"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -130,6 +130,7 @@ options:
     keyfile: /ssl/certs/client.key
     auto_discover_enable: true
     auto_discover_topic: homeassistant
+    # grid_charge_lock_topic: hems/batcontrol/grid_charge_lock # optional: absolute external MQTT topic for a HEMS/grid-operator grid-charge lock signal (section 14a EnWG)
 
   evcc:
     enabled: false
@@ -269,6 +270,7 @@ schema:
     keyfile: str?
     auto_discover_enable: bool?
     auto_discover_topic: str?
+    grid_charge_lock_topic: str? # optional: absolute external MQTT topic for a HEMS/grid-operator grid-charge lock signal (section 14a EnWG)
 
   evcc:
     enabled: bool
