@@ -2,6 +2,41 @@
 
 ## What's Changed
 
+### Enhancements
+
+- **evcc: Support `minpv` and `smart` PV-Surplus Charging Modes** (#430): Peak shaving is now
+  correctly bypassed when an evcc loadpoint reports mode `minpv` or `smart`, not just `pv`.
+  Previously only the `pv` mode was recognized as "EV absorbing PV surplus", so peak shaving
+  could still cap solar production while the EV charger was already soaking up the surplus in
+  `minpv`/`smart` mode.
+
+### Bug Fixes
+
+- **MQTT Inverter: `cache_ttl` Was Silently Ignored** (#427): The inverter factory built the
+  MQTT inverter's config dict key by key but never forwarded `cache_ttl`, so `MqttInverter`
+  always fell back to its 120s default regardless of what was configured. Users whose MQTT
+  bridge publishes SoC less often than every 120s were hitting a stale-cache timeout the option
+  exists to prevent. An explicit `cache_ttl: null` still falls back to the 120s default, same as
+  an absent key.
+
+- **`battery_control_expert.charge_rate_multiplier` Now Actually Takes Effect** (#426, closes
+  #424): The documented `battery_control_expert.charge_rate_multiplier` key was set on the logic
+  instance but never read back — the charge rate calculation silently used the undocumented
+  `battery_control.charge_rate_multiplier` instead. If you already set
+  `battery_control_expert.charge_rate_multiplier` in your config expecting it to change the
+  charge rate, it will now actually do so (default `1.1`, a 10% increase over the previous
+  hard-coded behaviour). The old `battery_control.charge_rate_multiplier` location still works
+  as a deprecated fallback with a one-time startup warning; `battery_control_expert` wins if
+  both are set. Invalid or non-finite values now raise a clear error at startup instead of
+  crashing later during charge-rate calculation.
+
+### Internal Changes
+
+- Value-parsing helpers (`parse_optional_ratio`, `parse_positive_number`, `parse_bool_flag`)
+  moved out of `core.py` into a new `value_utils` module; no behaviour change. (#428)
+- CI: `actions/checkout`, `actions/upload-artifact`, and `actions/download-artifact` GitHub
+  Actions workflows bumped to their latest major versions.
+
 # Release 0.9.0 - Released on 17.08.2026
 
 ## What's Changed
