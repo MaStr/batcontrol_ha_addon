@@ -10,6 +10,16 @@
   could still cap solar production while the EV charger was already soaking up the surplus in
   `minpv`/`smart` mode.
 
+- **Spread Grid Charging Over the Charging Window** (#431): New expert option
+  `battery_control_expert.spread_grid_charge_over_charge_window` (default `true`). With
+  `soften_price_difference_on_charging` enabled, the recharge energy is now spread over all
+  directly following slots that have a price lower than or equal to the current price, instead
+  of being crammed into the current slot only. **Behavior change:** with 15-minute price slots
+  this previously requested a very high charge rate and filled the battery long before the
+  cheap block ended; with the new default, charging is spread out and the battery reaches full
+  charge only at the end of the cheap block. Set the option to `false` to restore the previous,
+  single-slot charging behaviour.
+
 ### Bug Fixes
 
 - **MQTT Inverter: `cache_ttl` Was Silently Ignored** (#427): The inverter factory built the

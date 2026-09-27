@@ -44,6 +44,7 @@ https://mastr.github.io/batcontrol-dev/
 `charge_rate_multiplier`: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.`soften_price_difference_on_charging`:
 False # enable earlier charging based on a more relaxed calculation # future_price <= current_price-min_price_difference/soften_price_difference_on_charging_factor
 `soften_price_difference_on_charging_factor`: 5
+`spread_grid_charge_over_charge_window`: true # only with `soften_price_difference_on_charging` enabled: spread grid charging over all following slots with a price <= current price (the charging window) instead of the current slot only. Reduces the peak charge rate needed with short (e.g. 15-minute) price slots.
 `round_price_digits`: 4 # round price to n digits after the comma
 
 ### `inverter:`
