@@ -20,6 +20,15 @@
   charge only at the end of the cheap block. Set the option to `false` to restore the previous,
   single-slot charging behaviour.
 
+- **SIGHUP: Provider Refresh Now Happens at the Next Evaluation Interval** (#434): Sending
+  `SIGHUP` to a running batcontrol process still re-reads the consumption forecast load profile
+  CSV and recalculates the scaling factor, without a restart. **Behavior change:** previously
+  the signal woke the running sleep immediately and refreshed all providers (solar forecast,
+  dynamic tariff, consumption forecast) right away; now the handler only logs the request and
+  sets a flag, and the refresh happens at the start of the next control loop interval (every 3
+  minutes) instead, so the running evaluation loop is never interrupted. This can delay the
+  refresh by up to 3 minutes compared to before.
+
 ### Bug Fixes
 
 - **MQTT Inverter: `cache_ttl` Was Silently Ignored** (#427): The inverter factory built the
