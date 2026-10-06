@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.9.1dev3"
+version: "0.9.1dev4"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -124,6 +124,7 @@ options:
     broker: core-mosquitto
     port: 1883
     topic: house/batcontrol
+    # client_id: batcontrol # optional, default: batcontrol. Unique MQTT client identifier of this instance - only needed when several batcontrol instances share one broker
     username: user
     password: password
     retry_attempts: 5 # optional, default: 5
@@ -268,6 +269,7 @@ schema:
     broker: str
     port: int
     topic: str
+    client_id: str? # optional, default: batcontrol. Unique MQTT client identifier of this instance - only needed when several batcontrol instances share one broker
     username: str?
     password: password?
     retry_attempts: int?

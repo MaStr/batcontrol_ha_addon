@@ -98,6 +98,7 @@ Enables publishing of battery status and control messages via MQTT and integrate
 `broker`: localhost # MQTT broker hostname or IP
 `port`: 1883 # MQTT broker port
 `topic`: house/batcontrol # base topic for published MQTT messages
+`client_id`: batcontrol # unique MQTT client identifier of this instance (optional, default: `batcontrol`). Only needed when several batcontrol instances share one broker - a duplicate client ID makes the broker disconnect the other instance. Must not be left empty.
 `username`: user # MQTT username
 `password`: password # MQTT password
 `retry_attempts`: 5 # number of reconnect attempts before failing (optional, default: 5)
