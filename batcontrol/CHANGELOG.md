@@ -1,3 +1,101 @@
+# Release 0.9.1 - Released on 06.10.2026
+
+## What's Changed
+
+### Enhancements
+
+- **evcc: Support `minpv` and `smart` PV-Surplus Charging Modes** (#430): Peak shaving is now
+  correctly bypassed when an evcc loadpoint reports mode `minpv` or `smart`, not just `pv`.
+  Previously only the `pv` mode was recognized as "EV absorbing PV surplus", so peak shaving
+  could still cap solar production while the EV charger was already soaking up the surplus in
+  `minpv`/`smart` mode.
+
+- **Spread Grid Charging Over the Charging Window** (#431): New expert option
+  `battery_control_expert.spread_grid_charge_over_charge_window` (default `true`). With
+  `soften_price_difference_on_charging` enabled, the recharge energy is now spread over all
+  directly following slots that have a price lower than or equal to the current price, instead
+  of being crammed into the current slot only. **Behavior change:** with 15-minute price slots
+  this previously requested a very high charge rate and filled the battery long before the
+  cheap block ended; with the new default, charging is spread out and the battery reaches full
+  charge only at the end of the cheap block. Set the option to `false` to restore the previous,
+  single-slot charging behaviour.
+
+- **SIGHUP: Provider Refresh Now Happens at the Next Evaluation Interval** (#434): Sending
+  `SIGHUP` to a running batcontrol process still re-reads the consumption forecast load profile
+  CSV and recalculates the scaling factor, without a restart. **Behavior change:** previously
+  the signal woke the running sleep immediately and refreshed all providers (solar forecast,
+  dynamic tariff, consumption forecast) right away; now the handler only logs the request and
+  sets a flag, and the refresh happens at the start of the next control loop interval (every 3
+  minutes) instead, so the running evaluation loop is never interrupted. This can delay the
+  refresh by up to 3 minutes compared to before.
+
+- **Several Inverters as One Aggregated Battery** (#436): upstream batcontrol can now drive
+  several inverters/batteries as one large battery — capacities and energies are summed, the SoC
+  is the capacity-weighted average, and a charge rate is split over the inverters proportional to
+  their free capacity (capped by each `max_grid_charge_rate`, with a per-inverter
+  `min_charge_rate` floor of 500 W so a small rate feeds few inverters properly instead of all of
+  them uselessly). **Not available in this add-on:** it is configured as a *list* under
+  `inverter:`, which the Home Assistant add-on options/schema UI cannot express, so the add-on
+  keeps exactly one inverter. Use a YAML config (Docker/Compose/local Python) if you need it, see
+  https://mastr.github.io/batcontrol/configuration/multiple-inverters/. For single-inverter
+  setups — which is every add-on installation — behaviour is unchanged.
+
+- **New option `mqtt.client_id`** (#438): the MQTT client identifier can now be set explicitly
+  (optional, default `batcontrol`). Only needed when several batcontrol instances share one
+  broker — two instances with the same client ID make the broker disconnect each other in a
+  loop. The option is commented out in the configuration; leave it that way unless you run more
+  than one instance. It must not be left empty, an empty value aborts the start with a clear
+  error.
+
+### Bug Fixes
+
+- **MQTT Inverter: `cache_ttl` Was Silently Ignored** (#427): The inverter factory built the
+  MQTT inverter's config dict key by key but never forwarded `cache_ttl`, so `MqttInverter`
+  always fell back to its 120s default regardless of what was configured. Users whose MQTT
+  bridge publishes SoC less often than every 120s were hitting a stale-cache timeout the option
+  exists to prevent. An explicit `cache_ttl: null` still falls back to the 120s default, same as
+  an absent key.
+
+- **`battery_control_expert.charge_rate_multiplier` Now Actually Takes Effect** (#426, closes
+  #424): The documented `battery_control_expert.charge_rate_multiplier` key was set on the logic
+  instance but never read back — the charge rate calculation silently used the undocumented
+  `battery_control.charge_rate_multiplier` instead. If you already set
+  `battery_control_expert.charge_rate_multiplier` in your config expecting it to change the
+  charge rate, it will now actually do so (default `1.1`, a 10% increase over the previous
+  hard-coded behaviour). The old `battery_control.charge_rate_multiplier` location still works
+  as a deprecated fallback with a one-time startup warning; `battery_control_expert` wins if
+  both are set. Invalid or non-finite values now raise a clear error at startup instead of
+  crashing later during charge-rate calculation.
+
+- **MQTT Status Stuck on `offline` After a Restart** (#438, closes #437): stopping or restarting
+  the add-on left the retained `<topic>/status` topic in a wrong state — dashboards and Node-RED
+  flows showed batcontrol as permanently offline while it was running normally. Three causes,
+  all fixed: `SIGTERM` (the signal Home Assistant/Docker sends when stopping an add-on) is now
+  handled like `Ctrl+C`, so the shutdown path runs at all; the shutdown now publishes `offline`
+  to `<topic>/status` (retained) and disconnects cleanly from the broker instead of letting the
+  connection time out; and the MQTT client now uses the fixed client ID `batcontrol` instead of a
+  random one per start, so the broker drops the old session immediately and a stale Last-Will can
+  no longer overwrite the fresh `online` of the restarted instance about 100 s later.
+
+### Internal Changes
+
+- Value-parsing helpers (`parse_optional_ratio`, `parse_positive_number`, `parse_bool_flag`)
+  moved out of `core.py` into a new `value_utils` module; no behaviour change. (#428)
+- CI: `actions/checkout`, `actions/upload-artifact`, and `actions/download-artifact` GitHub
+  Actions workflows bumped to their latest major versions.
+- Pylint cleanups across the code base; no behaviour change. (#435)
+
+**Full Changelog**: https://github.com/MaStr/batcontrol/compare/0.9.0...0.9.1
+
+### 📌 Full Release Notes
+
+👉 [GitHub Release v0.9.1](https://github.com/MaStr/batcontrol/releases/tag/0.9.1)
+
+### 📚 Documentation
+
+👉 [Project Documentation](https://mastr.github.io/batcontrol/)
+
+
 # Release 0.9.0 - Released on 17.08.2026
 
 ## What's Changed
