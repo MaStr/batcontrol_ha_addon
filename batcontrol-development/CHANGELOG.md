@@ -1,4 +1,8 @@
-# Release 0.9.1 - in Development
+# Release 0.10.0 - in Development
+
+## What's Changed
+
+# Release 0.9.1 - Released on 06.10.2026
 
 ## What's Changed
 
