@@ -2,6 +2,15 @@
 
 ## What's Changed
 
+### 🔧 Technical Updates
+
+- **Python 3.14, minimum raised to 3.11**: the add-on base image moves from
+  `base-python:3.13-alpine3.23` to `base-python:3.14-alpine3.23` (Python 3.14.7), matching
+  upstream batcontrol, whose Docker image now ships Python 3.14. Upstream also raised its
+  supported range to Python 3.11 - 3.14: Python 3.9 has been end of life since 2025-10-31 and
+  3.10 reaches it on 2026-10-31. No configuration changes - `options:` and `schema:` are
+  unaffected.
+
 # Release 0.9.1 - Released on 06.10.2026
 
 ## What's Changed
