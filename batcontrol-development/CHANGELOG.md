@@ -2,7 +2,47 @@
 
 ## What's Changed
 
-### 🔧 Technical Updates
+### New Features
+
+- **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
+  a structured *decision trace* for every control cycle - the ordered list of rules it evaluated,
+  each with a stable reason code, the numbers behind it, and which one was decisive - and
+  publishes it over MQTT as a new auto-discovered `Decision` sensor. The sensor state is the
+  resulting mode with its plain-language reason; the full trace is attached as sensor attributes,
+  so the HA UI or an automation can show *why* the battery is charging instead of only *that* it
+  is. The last 200 traces are kept in memory, and a new event is published on every mode change
+  or when the mode's value moves by 25% or more. Nothing to configure - the sensor appears
+  automatically when `mqtt` is enabled. See
+  https://mastr.github.io/batcontrol-dev/features/decision-sensor/ for how to read it.
+
+### Enhancements
+
+- **Peak shaving now works with every logic type** (#445): peak shaving and the solar-cap rule
+  moved from the `next` logic into the default logic, so there is a single code path.
+  `battery_control.type: next` keeps working unchanged - it is now a silent alias for `default`.
+  **Behavior change, please read if you use peak shaving:** up to 0.10.0 the peak shaving options
+  only took effect with `type: next` and were documented as having no effect otherwise. The add-on
+  UI exposes the `peak_shaving` options independently of the logic type, so an add-on
+  installation may well carry `peak_shaving.enabled: true` from a time when it did nothing - and
+  that setting now becomes active. batcontrol logs a one-time `Peak shaving is ENABLED ...` line
+  at startup so the activation is announced rather than silent; check the add-on log after
+  updating and set `peak_shaving.enabled: false` if you do not want it. Details:
+  https://mastr.github.io/batcontrol-dev/features/peak-shaving/
+
+### Breaking Changes
+
+- **`peak_shaving.mode` removed** (#443, completes #418): the deprecated `peak_shaving.mode`
+  parameter is no longer accepted - a configuration that still contains it is **rejected at
+  startup** with a migration hint, instead of being mapped onto the rule switches with a
+  deprecation warning as in 0.9.x. The option has been removed from the add-on's `options:` and
+  `schema:`, so it can no longer be set from the HA UI. Migration, if you still had it set:
+  `time` -> `time_active: true` + `price_active: false`, `price` -> `price_active: true` +
+  `time_active: false`, `combined` -> both `true`. The `peak_shaving/mode` MQTT topic and its
+  Home Assistant select entity are gone as well; the retained discovery config is cleared, so the
+  stale entity disappears from HA on its own. Runtime control via MQTT keeps `enabled`,
+  `allow_full_battery_after` and `price_limit`.
+
+### Technical Updates
 
 - **Python 3.14, minimum raised to 3.11** (#444): the add-on base image moves from
   `base-python:3.13-alpine3.23` to `base-python:3.14-alpine3.23` (Python 3.14.7), matching
@@ -10,6 +50,11 @@
   supported range to Python 3.11 - 3.14: Python 3.9 has been end of life since 2025-10-31 and
   3.10 reaches it on 2026-10-31. No configuration changes - `options:` and `schema:` are
   unaffected.
+
+- **ASCII art startup banner** (#442): batcontrol logs an eyecatcher once at startup -
+  `BATCONTROL` in block letters, the catch phrase "riding your power prices" and the running
+  package version. Handy when scrolling the add-on log: it marks exactly where a restart happened
+  and which version came up.
 
 # Release 0.9.1 - Released on 06.10.2026
 

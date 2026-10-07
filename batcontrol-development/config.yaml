@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.10.0dev2"
+version: "0.10.0dev3"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -20,7 +20,9 @@ options:
   log_everything: false # if false debug messages from fronius.auth and urllib3.connectionpool will be suppressed
   max_logfile_size: 100 #kB
   battery_control:
-    type: default # Logic type: 'default' (standard) or 'next' (includes peak shaving support)
+    type: default # Logic type: 'default' is the recommended standard logic.
+                  # 'next' is a historical alias kept for existing configurations
+                  # and behaves identically.
     min_price_difference: 0.05 # minimum price difference in Euro to justify charging your battery
     min_price_difference_rel:
       0.10 # Percentage (in decimal) of the current price to justify charging your battery
@@ -40,7 +42,6 @@ options:
     feed_in_limit_w: 0 # Watt - grid feed-in power limit (solar rule). 0 = neutral/off.
                        # German Solarspitzengesetz: 60% of installed power, e.g. 0.6 * kWp * 1000
     feed_in_limit_headroom: 1.0 # Safety factor >= 1.0 on the forecast surplus (solar rule); 1.1 if curtailment is observed
-    # mode: combined # DEPRECATED - 'time'|'price'|'combined', mapped onto the switches above (logs a warning)
   battery_control_expert:
     charge_rate_multiplier: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
@@ -160,7 +161,8 @@ schema:
   log_everything: bool
   max_logfile_size: int
   battery_control:
-    type: list(default|next)? # Logic type: 'default' (standard) or 'next' (includes peak shaving)
+    type: list(default|next)? # Logic type: 'default' is the recommended standard logic;
+                              # 'next' is a historical alias and behaves identically.
     min_price_difference: float(0,) # minimum price difference in Euro to justify charging your battery
     min_price_difference_rel: float(0,)?
     always_allow_discharge_limit: float(0,1) # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
@@ -177,7 +179,6 @@ schema:
     price_limit: float? # Euro/kWh - cheap-price threshold, used when price_active is true
     feed_in_limit_w: float(0,)? # Watt - grid feed-in power limit for the solar rule (default: 0 = neutral)
     feed_in_limit_headroom: float(1,)? # Safety factor >= 1.0 on forecast surplus for the solar rule (default: 1.0)
-    mode: list(time|price|combined)? # DEPRECATED: mapped onto the switches above at load time (logs a warning)
   battery_control_expert:
     charge_rate_multiplier: float(0,) # Increase (>1) calculated charge rate to compensate charge inefficencies.
     soften_price_difference_on_charging:
