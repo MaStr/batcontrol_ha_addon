@@ -39,6 +39,46 @@ https://mastr.github.io/batcontrol-dev/
 `always_allow_discharge_limit`: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is allowed regardless of other parameters. This value can be set lower to 1.00 if you want to ensure that always some capacity remains available in case the sun starts shining more than forecasted.
 `max_charging_from_grid_limit`: 0.90 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit. Above this limit only Solar Power may be used to increase the charge level.
 
+### `peak_shaving:`
+
+Peak shaving limits the rate at which your **PV system** charges the battery, so the battery is
+not already full when the sun is at its strongest. The reserved capacity absorbs the midday peak
+instead of having it curtailed or fed in at a low price. Three rules work independently and can
+each be switched off:
+
+- **time rule** (`time_active`): spread charging so the battery is full only by
+  `allow_full_battery_after` instead of as early as possible.
+- **price rule** (`price_active`): keep capacity free for upcoming cheap-price PV windows below
+  `price_limit`.
+- **solar rule** (`solar_cap_active`): absorb PV power above `feed_in_limit_w` to prevent
+  clipping against a grid feed-in limit.
+
+> **Note when updating to 0.10.0:** peak shaving used to require `battery_control.type: next` and
+> had no effect otherwise, but it now works with every logic type. Because this add-on always
+> showed the options below regardless of the logic type, your configuration may still carry
+> `enabled: true` from a time when it did nothing - and it becomes active with this update.
+> batcontrol logs a one-time `Peak shaving is ENABLED ...` line at startup, so check the add-on
+> log after updating and set `enabled: false` if you do not want it.
+
+`enabled`: false # master switch for all three rules. Leave at false if you are unsure.
+
+`time_active`: true # target-time rule: spread charging until `allow_full_battery_after`
+`price_active`: true # price rule: reserve capacity for cheap-price PV windows
+`solar_cap_active`: false # solar feed-in limit rule: absorb PV power above `feed_in_limit_w`
+
+`allow_full_battery_after`: 14 # Hour 0-23 by which the battery should be full (time rule). Set it to the hour your PV peak is over.
+`price_limit`: 0.05 # EUR/kWh cheap-slot threshold for the price rule. -1 disables the price rule component.
+
+`feed_in_limit_w`: 0 # Watt grid feed-in power limit for the solar rule. 0 = neutral/off. For the German Solarspitzengesetz use 60% of installed power, i.e. 0.6 * kWp * 1000 (6000 for a 10 kWp plant).
+`feed_in_limit_headroom`: 1.0 # Safety factor >= 1.0 applied to the forecast surplus (solar rule). Raise it to about 1.1 if you still observe curtailment.
+
+The `mode` parameter (`time`/`price`/`combined`) was **removed** in 0.10.0 and is now rejected at
+startup. Use the three switches instead: `time` -> `time_active` only, `price` -> `price_active`
+only, `combined` -> both.
+
+Full description with worked example days:
+https://mastr.github.io/batcontrol-dev/features/peak-shaving/
+
 ### `battery_control_expert`:
 
 `charge_rate_multiplier`: 1.1 # Increase (>1) calculated charge rate to compensate charge inefficencies.`soften_price_difference_on_charging`:
