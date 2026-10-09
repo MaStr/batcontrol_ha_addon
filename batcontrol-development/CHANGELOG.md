@@ -42,6 +42,40 @@
   stale entity disappears from HA on its own. Runtime control via MQTT keeps `enabled`,
   `allow_full_battery_after` and `price_limit`.
 
+### Bug Fixes
+
+- **Decision sensor: current numbers and clearer texts** (#450): the `Decision` sensor kept the
+  trace of the last *mode change*, so the numbers in its text (e.g. the usable energy behind
+  `Discharge Allowed`) could be hours old, and a new reason for the same mode never appeared at
+  all. The sensor is now also updated when the decisive reason changes, and otherwise refreshed
+  every 15 minutes, so its text is at most 15 minutes old. A refresh does not count as a status
+  change. The texts were reworked as well: `Avoid Discharge` now explains both why the battery is
+  held (usable energy vs. reserve) and why it is not topped up from the grid; a charge rate capped
+  by `max_grid_charge_rate` / `max_pv_charge_rate` / `min_pv_charge_rate` is appended in brackets
+  instead of replacing the actual reason; and the explanations for the always-allow level, peak
+  shaving (now naming the active rule), the solar feed-in limit, the safe-mode fallbacks, the
+  external unblock and the grid charge lock were reworded.
+  See https://mastr.github.io/batcontrol-dev/features/decision-sensor/
+
+- **15-minute resolution: four times too many HomeAssistant history requests** (#447, fixes #446):
+  with `time_resolution_minutes: 15` the consumption forecast horizon was handed to the providers
+  as hours although it was counted in slots, so the horizon was 4x too long and the
+  `homeassistant-api` consumption provider issued roughly four times the needed
+  `recorder/statistics_during_period` requests on a cold cache. The forecast values themselves were
+  correct - the only symptoms were avoidable load on HomeAssistant and a slower startup. The
+  request is now resolution-neutral, the slots already elapsed in the current hour are included so
+  the full horizon is really delivered, and the horizon is capped at 48 hours in all code paths.
+  Only relevant for `consumption_forecast.type: homeassistant-api`; CSV profiles are unaffected.
+
+- **Telegraf/InfluxDB: full decision text instead of a single word** (#449): for users who pipe the
+  batcontrol MQTT topics into InfluxDB with the upstream `config/telegraf.sample.conf`, the new
+  `/decision` topic was picked up by the catch-all `house/batcontrol/+` input, whose `value` parser
+  keeps only the last whitespace-separated token - `"Charge from Grid 1250 W - usable energy is
+  below the reserve"` arrived as `decision="reserve"`. The sample config now excludes the topic
+  from the catch-all and adds a dedicated consumer that stores the whole sentence as measurement
+  `batcontrol-decision`, plus a commented-out consumer for `/decision/attributes`. The MQTT payload
+  itself was always correct, so the HA sensor and other consumers were never affected.
+
 ### Technical Updates
 
 - **Python 3.14, minimum raised to 3.11** (#444): the add-on base image moves from
@@ -50,6 +84,12 @@
   supported range to Python 3.11 - 3.14: Python 3.9 has been end of life since 2025-10-31 and
   3.10 reaches it on 2026-10-31. No configuration changes - `options:` and `schema:` are
   unaffected.
+
+- **Upstream reference config slimmed down** (#448): upstream trimmed the comments in
+  `config/batcontrol_config_dummy.yaml` (359 -> 242 lines) and moved the explanations into the
+  documentation. No parameter was added, removed or changed its value, so the add-on's `options:`
+  and `schema:` are untouched - the add-on takes its configuration from the HA UI, not from that
+  file. Listed only so the upstream change is traceable here.
 
 - **ASCII art startup banner** (#442): batcontrol logs an eyecatcher once at startup -
   `BATCONTROL` in block letters, the catch phrase "riding your power prices" and the running
