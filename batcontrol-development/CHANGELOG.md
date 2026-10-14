@@ -25,6 +25,17 @@
   logs a deprecation warning instead, so a hand-written configuration keeps working.
   All `api_token` fields are now masked in the UI.
 
+- **`peak_shaving.mode` removed** (#443, completes #418): the deprecated `peak_shaving.mode`
+  parameter is no longer accepted - a configuration that still contains it is **rejected at
+  startup** with a migration hint, instead of being mapped onto the rule switches with a
+  deprecation warning as in 0.9.x. The option has been removed from the add-on's `options:` and
+  `schema:`, so it can no longer be set from the HA UI. Migration, if you still had it set:
+  `time` -> `time_active: true` + `price_active: false`, `price` -> `price_active: true` +
+  `time_active: false`, `combined` -> both `true`. The `peak_shaving/mode` MQTT topic and its
+  Home Assistant select entity are gone as well; the retained discovery config is cleared, so the
+  stale entity disappears from HA on its own. Runtime control via MQTT keeps `enabled`,
+  `allow_full_battery_after` and `price_limit`.
+
 ### New Features
 
 - **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
@@ -63,20 +74,19 @@
   updating and set `peak_shaving.enabled: false` if you do not want it. Details:
   https://mastr.github.io/batcontrol-dev/features/peak-shaving/
 
-### Breaking Changes
-
-- **`peak_shaving.mode` removed** (#443, completes #418): the deprecated `peak_shaving.mode`
-  parameter is no longer accepted - a configuration that still contains it is **rejected at
-  startup** with a migration hint, instead of being mapped onto the rule switches with a
-  deprecation warning as in 0.9.x. The option has been removed from the add-on's `options:` and
-  `schema:`, so it can no longer be set from the HA UI. Migration, if you still had it set:
-  `time` -> `time_active: true` + `price_active: false`, `price` -> `price_active: true` +
-  `time_active: false`, `combined` -> both `true`. The `peak_shaving/mode` MQTT topic and its
-  Home Assistant select entity are gone as well; the retained discovery config is cleared, so the
-  stale entity disappears from HA on its own. Runtime control via MQTT keeps `enabled`,
-  `allow_full_battery_after` and `price_limit`.
-
 ### Bug Fixes
+
+- **Credentials no longer end up in the log** (#453, two code scanning findings of severity
+  "high"): the Fronius inverter's digest `Authorization` header - derived from the inverter
+  password and replayable for as long as the server nonce is valid - was written to the log in
+  clear text by the auth debug logger, and again through the `RuntimeError` raised for a failed
+  request. forecast.solar takes the API key as the first path segment of the request URL, so the
+  rate-limit and error branches logged response bodies and header dumps that echoed the key back.
+  Credential header values are now shortened to their first and last three characters (six
+  characters or less are masked completely), and the API key is replaced by that masked form in
+  everything logged from a forecast.solar response, which keeps the provider's own message
+  readable. The nonce, cnonce and nc values needed to debug digest auth are still logged in full.
+  Relevant for everyone who attaches `/data/batcontrol.log` to an issue; no configuration changes.
 
 - **Decision sensor: current numbers and clearer texts** (#450): the `Decision` sensor kept the
   trace of the last *mode change*, so the numbers in its text (e.g. the usable energy behind
