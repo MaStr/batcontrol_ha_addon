@@ -15,6 +15,20 @@ batcontrol connects to evcc, if you like to.
 
 You find more under:  [batcontrol documentation](https://mastr.github.io/batcontrol/)
 
+## Issues and questions
+
+This repository only contains the Home Assistant add-on packaging. The add-on itself, its
+documentation and all configuration parameters come from the upstream
+[MaStr/batcontrol](https://github.com/MaStr/batcontrol) project, so please report everything
+there — including problems that only show up inside Home Assistant:
+
+- **Bugs and feature requests:** <https://github.com/MaStr/batcontrol/issues>
+- **Questions, ideas and general exchange:** <https://github.com/MaStr/batcontrol/discussions>
+
+When opening an issue, please mention that you are using the Home Assistant add-on, which
+add-on you installed (*Batcontrol-next* or *Batcontrol-development*), its version from the
+add-on page, and attach the add-on log.
+
 ## Support my work
 
 - You can support my work using [Github Sponsoring](https://github.com/sponsors/MaStr).
