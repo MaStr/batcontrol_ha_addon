@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.10.0dev4"
+version: "0.10.0dev5"
 slug: "batcontrol-development"
 init: false
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
@@ -75,7 +75,7 @@ options:
     # retry_backoff_seconds: 60 # Optional: Seconds to wait before retrying after failure (default: 60)
   utility:
     type: awattar_de #tibber, awattar_at, awattar_de, evcc, energyforecast, energyforecast_total_price, tariff_zones
-    apikey: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber, energyforecast, energyforecast_total_price
+    api_token: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber, energyforecast, energyforecast_total_price
     # market_zone: DE # optional for energyforecast/energyforecast_total_price: DE/LU (both -> DE-LU, default), AT, FR, NL, BE, PL, DK1, DK2
     url: http://evcc.local:7070/api/tariff/grid # only required for evcc
     vat: 0.19 # only required for awattar and energyforecast
@@ -100,19 +100,19 @@ options:
       declination: 32 #inclination toward horizon 0..90 0=flat 90=vertical (e.g. wallmounted)
       azimuth: -90 # -90:East, 0:South, 90:West -180..180
       kWp: 15.695 # power in kWp
-      url: http://evcc.local:7070/api/tariff/solar # only required for evcc-solar
+      url: http://evcc.local:7070/api/tariff/solar # evcc-solar: REST endpoint, homeassistant-solar-forecast-ml: ws://homeassistant:8123
+      # api_token: YOUR_API_TOKEN # fcsolarapi/solcast: API key, homeassistant-solar-forecast-ml: long-lived access token from HA Profile
       # For HomeAssistant Solar Forecast ML (HACS integration):
-      # base_url: ws://homeassistant:8123 # HomeAssistant WebSocket URL
-      # api_token: YOUR_LONG_LIVED_ACCESS_TOKEN # Long-lived access token from HA Profile
-      # entity_id: sensor.solar_forecast_ml_prognose_nachste_stunde # Forecast sensor entity ID
+      # type: homeassistant-solar-forecast-ml # optional, explicit provider type
+      # entity_id: sensor.solar_forecast_ml_evcc_solar_prognose # Forecast sensor entity ID
       # sensor_unit: auto # Options: 'auto' (default), 'Wh', or 'kWh'
-      # cache_ttl_hours: 24.0 # Cache duration in hours (default: 24.0)
+      # cache_ttl_hours: 12.0 # How long a fetched forecast stays usable (default: 12.0)
   consumption_forecast:
     type: csv
     annual_consumption: 4500 # total consumption in kWh p.a. the load profile
     load_profile: load_profile.csv #name of the load profile file within the config folder
-    base_url: ws://homeassistant:8123 # Your HomeAssistant URL
-    apitoken: YOUR_LONG_LIVED_ACCESS_TOKEN # Get from HomeAssistant Profile
+    url: ws://homeassistant:8123 # Your HomeAssistant URL
+    api_token: YOUR_LONG_LIVED_ACCESS_TOKEN # Get from HomeAssistant Profile
     entity_id: sensor.energy_consumption # Entity ID with consumption data (in Wh or kWh)
     history_days: "-7;-14;-21" # Days to look back for historical data
     history_weights: "1;1;1" # Weight for each history period (1-10), higher = more influence
@@ -217,7 +217,7 @@ schema:
     retry_backoff_seconds: int(1,)? # Seconds to wait before retrying after failure (default: 60)
   utility:
     type: list(tibber|awattar_at|awattar_de|evcc|energyforecast|energyforecast_total_price|tariff_zones)
-    apikey: password? # only required for tibber, energyforecast, energyforecast_total_price
+    api_token: password? # only required for tibber, energyforecast, energyforecast_total_price
     market_zone: str? # optional for energyforecast/energyforecast_total_price (default: DE; DE/LU -> DE-LU)
     url: str? # only required for evcc
     vat: float(0,10)? # only required for awattar and energyforecast
@@ -242,22 +242,21 @@ schema:
       declination: float(0,90)? #inclination toward horizon 0..90 0=flat 90=vertical (e.g. wallmounted)
       azimuth: float(,180)? # -90:East, 0:South, 90:West -180..180
       kWp: float(0,)? # power in kWp
-      url: str? # only required for evcc-solar
-      apikey: str? # forecastsolarapi
+      type: str? # optional: explicit provider type of this entry
+      url: str? # evcc-solar: REST endpoint, homeassistant-solar-forecast-ml: WebSocket URL
+      api_token: password? # fcsolarapi/solcast: API key, homeassistant-solar-forecast-ml: Long-lived access token
       horizon: str? # forecastsolarapi horizon modifier
       resource_id: str? # solcast: rooftop site resource ID
       percentile: list(10|50|90)? # solcast: forecast percentile (default: 50)
-      base_url: str? # homeassistant-solar-forecast-ml: HomeAssistant WebSocket URL
-      api_token: str? # homeassistant-solar-forecast-ml: Long-lived access token
       entity_id: str? # homeassistant-solar-forecast-ml: Forecast sensor entity ID
       sensor_unit: list(auto|Wh|kWh)? # homeassistant-solar-forecast-ml: Sensor unit (default: auto)
-      cache_ttl_hours: float(0,)? # homeassistant-solar-forecast-ml: Cache TTL in hours (default: 24.0)
+      cache_ttl_hours: float(0,)? # homeassistant-solar-forecast-ml: Cache TTL in hours (default: 12.0)
   consumption_forecast:
     type: list(csv|homeassistant-api)
     annual_consumption: float(0,)? # CSV - total consumption in kWh p.a. the load profile
     load_profile: str # CSV - name of the load profile file within the config folder
-    base_url: str? # HA - Websocket URL
-    apitoken: str? # HA - Long Lived Access Token
+    url: str? # HA - Websocket URL
+    api_token: password? # HA - Long Lived Access Token
     entity_id: str? # HA - Entity ID with consumption data (in Wh)
     history_days: str? # HA - which days to look back for historical data
     history_weights: str? # HA - weight for each history period (1-10), higher = more influence

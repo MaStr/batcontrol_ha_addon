@@ -29,6 +29,11 @@ https://mastr.github.io/batcontrol-dev/
 
 ## Configuration Parameters
 
+**Credential and URL keys (changed in 0.10.0):** every section uses the same two key names -
+`api_token` for a credential and `url` for an endpoint. The former `apikey`, `apitoken` and
+`base_url` options no longer exist in this add-on. If you used them, move your values to
+`api_token` / `url` once; the add-on will not start while an unknown option is stored.
+
 `timezone:` Europe/Berlin your time zone. not optional.
 `loglevel:` Verbosity of the add-on logs.
 
@@ -98,36 +103,76 @@ False # enable earlier charging based on a more relaxed calculation # future_pri
 
 ### `utility`:
 
-`type`: your electricity provider. Currently supported: `tibber`, `awattar_at`, `awattar_de`, `evcc`
-`apikey`: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber , ignored for awattar
+`type`: your electricity provider. Currently supported: `tibber`, `awattar_at`, `awattar_de`, `evcc`, `energyforecast`, `energyforecast_total_price`, `tariff_zones`
+`api_token`: Zz-YOURAPIKEYYOURAPIKEYXXXXX # only required for tibber, energyforecast and energyforecast_total_price, ignored for awattar
+`url`: http://evcc.local:7070/api/tariff/grid # only required for evcc
 `vat`: 0.20 # only required for awattar, ignored for tibber
 `fees`: 0.015 # only required for awattar, ignored for tibber
 `markup`: 0.03 # only required for awattar, ignored for tibber
-Tibber provides the personal prices directly via the API. So you need the apikey to get the price for YOUR home.
+Tibber provides the personal prices directly via the API. So you need the api_token to get the price for YOUR home.
 Awattar only provides the EPEX Spot prices via the API. So the final price is calculated in the software using this formula:
 (Spotprice x (1 + markup) + fees) x (1 + VAT)
 
 ### `solar_forecast_provider`:
 
-choose between fcsolarapi and solarprognose. Check https://mastr.github.io/batcontrol/configuration/solar-forecast/ for details.
+choose between `fcsolarapi` (default), `homeassistant-solar-forecast-ml`, `evcc-solar` and `solcast`. Check https://mastr.github.io/batcontrol/configuration/solar-forecast/ for details.
 
 ### `pvinstallations`:
 
+Only the entry belonging to the selected `solar_forecast_provider` is used: batcontrol looks for an entry with a matching `type`, then for one carrying `entity_id`, and otherwise takes the first entry. Keep the keys of one provider together in one entry.
+
+Common keys:
+
 `- name:` Haus #name of the installation. multiple installations can be added. Dont forget the hyphen in front of `name` to indicate that its a list
+`type`: fcsolarapi # optional, makes explicit which provider this entry belongs to
+
+For `fcsolarapi` (PVGIS based, needs the location):
+
 `lat`: 48.4334480 Latitude in degree. Negative values indicate locations south of the equator.
 `lon`: 8.7654968 Longitude. Negative Values indicate locations in the West.
 `declination`: 32 #inclination toward horizon 0..90 degree 0=flat 90=vertical (e.g. wallmounted)
 `azimuth`: -90 # -90:East, 0:South, 90:West Range: -180..180
 `kWp`: 15.695 # power in kWp
-`apikey`: apikey for solarprognose or fcsolarapi if you are a customer and have a key
-`algorithm`: only for solarprognose. optional.
-`item`: only for solarprognose. optional.
-`token`: only for solarprognose. optional.
+`api_token`: optional, only if you are a forecast.solar customer and have a key
+`horizon`: 30,30,30,0,0,0 # optional, only if the array is shaded
+
+For `homeassistant-solar-forecast-ml` (HACS integration):
+
+`url`: ws://homeassistant:8123 # HomeAssistant WebSocket URL
+`api_token`: YOUR_LONG_LIVED_ACCESS_TOKEN # long-lived access token from your HA profile
+`entity_id`: sensor.solar_forecast_ml_evcc_solar_prognose # the forecast sensor
+`sensor_unit`: auto # `auto` (default), `Wh` or `kWh`. A fixed value skips detection
+`cache_ttl_hours`: 12.0 # how long a fetched forecast stays usable as a fallback (default: 12.0)
+
+For `evcc-solar`:
+
+`url`: http://evcc.local:7070/api/tariff/solar # evcc REST endpoint
+
+For `solcast`: the site geometry is configured in the Solcast web toolkit, not here.
+
+`resource_id`: xxxx-xxxx-xxxx-xxxx # from your Solcast rooftop site
+`api_token`: your-solcast-api-key # from your Solcast account settings
+`percentile`: 50 # optional: 10 (pessimistic), 50 (default), 90 (optimistic)
 
 ### consumption_forecast:
 
+`type`: csv or homeassistant-api
+
+For `csv`:
+
 `annual_consumption`: 4500 # total consumption in kWh p.a. . The load profile is scaled to meet this value. (optional)
 `load_profile`: load_profile.csv #name of the load profile file within the config folder. You can also add your own load profile. To do so you need to place a file in the running container in the directory /batcontrol/config/
+
+For `homeassistant-api`:
+
+`url`: ws://homeassistant:8123 # HomeAssistant WebSocket URL
+`api_token`: YOUR_LONG_LIVED_ACCESS_TOKEN # long-lived access token from your HA profile
+`entity_id`: sensor.energy_consumption # entity with consumption data, needs long-term statistics
+`sensor_unit`: auto # `auto`, `Wh` or `kWh`
+`history_days`: "-7;-14;-21" # which days to look back
+`history_weights`: "1;1;1" # weight per history period (1-10)
+`cache_ttl_hours`: 48.0 # how long computed statistics are cached
+`multiplier`: 1.0 # forecast adjustment (1.0 = unchanged)
 
 ### `mqtt`:
 

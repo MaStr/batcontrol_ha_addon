@@ -2,6 +2,29 @@
 
 ## What's Changed
 
+### Breaking Changes
+
+- **One name per thing: `api_token` and `url`** (#451): batcontrol used three spellings for a
+  credential (`apikey`, `apitoken`, `api`) and two for an endpoint (`url`, `base_url`),
+  depending on the section. A user who put a long-lived access token into `apikey` of a
+  HomeAssistant solar installation got no error - just `expected str at 'access_token'. Got None`
+  at startup, because the right value sat in the wrong key. From now on the credential is always
+  `api_token` and the endpoint is always `url`.
+
+  **What you have to do:** rename these options in your add-on configuration before updating,
+  or right after the update - the add-on does not start while an option it no longer knows is
+  stored:
+
+  | old option | new option | section |
+  |---|---|---|
+  | `apikey` | `api_token` | `utility`, `pvinstallations` |
+  | `apitoken` | `api_token` | `consumption_forecast` |
+  | `base_url` | `url` | `pvinstallations`, `consumption_forecast` |
+
+  batcontrol itself (Docker, pip, own `batcontrol_config.yaml`) still reads the old spellings and
+  logs a deprecation warning instead, so a hand-written configuration keeps working.
+  All `api_token` fields are now masked in the UI.
+
 ### New Features
 
 - **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
@@ -16,6 +39,17 @@
   https://mastr.github.io/batcontrol-dev/features/decision-sensor/ for how to read it.
 
 ### Enhancements
+
+- **Solar forecast: the matching `pvinstallations` entry is used** (#451): batcontrol read the
+  connection details of the HomeAssistant Solar Forecast ML provider only from the *first*
+  `pvinstallations` entry, so a correctly filled second entry was silently ignored. It now picks
+  the entry with a matching `type`, or the one carrying `entity_id`. A missing `api_token` or
+  `entity_id` is reported as a configuration error naming the key, before any connection to
+  HomeAssistant is attempted.
+- **`cache_ttl_hours` works for the solar forecast** (#451): the option was documented for
+  `homeassistant-solar-forecast-ml` since it was introduced, but nothing ever read it - the cache
+  always ran with its default of 12 hours. It is now applied. The default is unchanged, so
+  existing setups behave exactly as before; the add-on comment and docs said 24.0 and were wrong.
 
 - **Peak shaving now works with every logic type** (#445): peak shaving and the solar-cap rule
   moved from the `next` logic into the default logic, so there is a single code path.
