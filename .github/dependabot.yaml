@@ -5,3 +5,12 @@ updates:
     schedule:
       interval: weekly
       time: "06:00"
+  # The development add-on pins two base images of its own now - the source
+  # stage and the Node stage that builds the dashboard. The stable add-on has
+  # nothing to track: its Dockerfile only uses $BUILD_FROM, which comes from
+  # build.yaml and follows the Home Assistant base image release cycle.
+  - package-ecosystem: "docker"
+    directory: "/batcontrol-development"
+    schedule:
+      interval: weekly
+      time: "06:00"
