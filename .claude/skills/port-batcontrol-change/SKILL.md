@@ -25,6 +25,11 @@ Diff it against the add-on's `options:` block. If a local clone of batcontrol ex
 - **New/changed/removed config parameter** -> Steps 2-4 (config.yaml), 5 (DOCS), 6 (CHANGELOG), 7 (version)
 - **Behavior change, no config change** -> Steps 5-7 only (DOCS if user-facing, CHANGELOG, version)
 - **Build-relevant change** (entrypoint_ha.sh, pyproject, file moves in upstream `config/`) -> also check both Dockerfiles
+- **Add-on surface change** -> the manifest itself, not only `options:`. An upstream feature can
+  need keys that are not configuration at all: a web UI needs `ingress`/`ingress_port` and a
+  panel entry, a network service may want `ports`/`ports_description`, a new data directory
+  needs `map:`. See Step 4b. These are also the changes where the development and stable
+  manifests drift, so note them for the next release sync.
 
 ## Step 2 — Pick the target add-on
 
@@ -71,6 +76,24 @@ Rules of thumb:
   a non-optional new key breaks every installed instance on update.
 - Carry the upstream comment onto the schema line (this repo documents both blocks).
 - SoC-style fractions -> `float(0,1)`, hours -> `int(0,23)`, watts/Wh -> `float(0,)`/`int(0,)`.
+
+## Step 4b — Add-on manifest keys (only when the add-on surface changes)
+
+Not every upstream feature is just an option. Things that live outside `options:`/`schema:`:
+
+| Upstream feature | Manifest keys |
+|---|---|
+| A web UI | `ingress: true`, `ingress_port: <port>`, `panel_icon`, `panel_title` |
+| A network service users may want to reach directly | `ports:` (map to `null` so it is unmapped by default) plus `ports_description:` |
+| A new directory batcontrol reads or writes | `map:` |
+
+Two rules that are easy to get wrong:
+
+- **An ingress service must bind to `0.0.0.0` inside the container.** The supervisor connects
+  from outside the container, so a `127.0.0.1` default that is right for Docker makes the panel
+  unreachable here. Set the add-on's option accordingly and say so in DOCS.md.
+- **A mapped port bypasses Home Assistant's authentication.** Ingress is authenticated; a port
+  under `ports:` is not. Leave it `null` by default and document what to set before exposing it.
 
 ## Step 5 — Update DOCS.md (if user-facing)
 
@@ -121,6 +144,7 @@ new top-level block was added in Step 3.
 [ ] Upstream change identified (PR # / tag)
 [ ] Target chosen (development vs. stable)
 [ ] options: updated (position + comments match upstream dummy config)
+[ ] manifest keys (ingress/ports/map) if the add-on surface changed
 [ ] schema: updated (optional `?` for new keys)
 [ ] DOCS.md updated (if user-facing)
 [ ] CHANGELOG.md entry with upstream PR #

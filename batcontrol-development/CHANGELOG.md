@@ -38,6 +38,28 @@
 
 ### New Features
 
+- **A dashboard in the sidebar, and a read-only API behind it**: the add-on now has a
+  **Batcontrol** entry in the Home Assistant sidebar showing what batcontrol is doing and why -
+  the current decision with its full trace, a hundred-cell state-of-charge grid in the style of
+  the old defragmenter, and the price forecast with the cheapest and most expensive hours. It is
+  served through ingress, so Home Assistant authenticates it and nothing has to be published.
+
+  Behind it sits a read-only HTTP API (`/api/v1`) with its own OpenAPI documentation, and
+  optionally an MCP server (`/mcp`) that lets an AI assistant answer questions like *"why is the
+  battery not discharging right now?"*. Both are **read-only by design**: there is no way to set
+  a mode, a charge rate or a parameter through them - overrides stay on MQTT, where Home
+  Assistant can gate them behind its own automations.
+
+  Configured under the new `api:` option block. It is **enabled by default** in this add-on,
+  because the sidebar panel needs it; set `enabled: false` to turn the whole thing off. Leave
+  `host` at `0.0.0.0` - ingress connects from the supervisor, and `127.0.0.1` makes the panel
+  unreachable. To reach the API from outside Home Assistant, map port 8080 in the add-on's
+  network settings and set `auth_token` first: a mapped port bypasses Home Assistant's
+  authentication.
+
+  See https://mastr.github.io/batcontrol-dev/features/dashboard/ and
+  https://mastr.github.io/batcontrol-dev/integrations/rest-api/.
+
 - **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
   a structured *decision trace* for every control cycle - the ordered list of rules it evaluated,
   each with a stable reason code, the numbers behind it, and which one was decisive - and
