@@ -1,8 +1,22 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.10.0dev6"
+version: "0.10.0dev7"
 slug: "batcontrol-development"
 init: false
+
+# The read-only dashboard is served through ingress, so Home Assistant
+# authenticates every request and no port has to be published.
+ingress: true
+ingress_port: 8080
+panel_icon: mdi:battery-charging
+panel_title: Batcontrol
+# Optional direct access to the API, dashboard and MCP endpoint from the
+# network. Unmapped by default - ingress covers the dashboard, and a mapped
+# port is reachable without Home Assistant's authentication.
+ports:
+  8080/tcp: null
+ports_description:
+  8080/tcp: "Read-only API, dashboard and MCP server (set api.auth_token before exposing this)"
 #image: "ghcr.io/mastr/batcontrol_ha_addon"
 arch:
   - aarch64
@@ -137,6 +151,16 @@ options:
     auto_discover_enable: true
     auto_discover_topic: homeassistant
     # grid_charge_lock_topic: hems/batcontrol/grid_charge_lock # optional: absolute external MQTT topic for a HEMS/grid-operator grid-charge lock signal (section 14a EnWG)
+
+  api:
+    enabled: true # read-only REST API, dashboard and MCP server. Needed for the sidebar panel
+    host: 0.0.0.0 # must stay 0.0.0.0: ingress connects from the Home Assistant supervisor
+    port: 8080 # must match ingress_port in this file
+    dashboard_enabled: true # serve the dashboard on the sidebar panel
+    docs_enabled: false # serve Swagger UI at /docs and the schema at /openapi.json
+    mcp_enabled: false # serve the MCP server at /mcp for AI assistants
+    # auth_token: "" # bearer token for /api/v1, only needed when port 8080 is mapped
+    # mcp_auth_token: "" # separate token for /mcp; empty = inherits auth_token
 
   evcc:
     enabled: false
@@ -281,6 +305,16 @@ schema:
     auto_discover_enable: bool?
     auto_discover_topic: str?
     grid_charge_lock_topic: str? # optional: absolute external MQTT topic for a HEMS/grid-operator grid-charge lock signal (section 14a EnWG)
+
+  api:
+    enabled: bool? # read-only REST API, dashboard and MCP server (add-on default: true)
+    host: str? # bind address; must stay 0.0.0.0 for ingress
+    port: int(1,65535)? # must match ingress_port (default: 8080)
+    dashboard_enabled: bool? # serve the web dashboard (default: true)
+    docs_enabled: bool? # serve Swagger UI and the OpenAPI schema (default: false)
+    mcp_enabled: bool? # serve the MCP server at /mcp (default: false)
+    auth_token: password? # optional bearer token for /api/v1; empty = no authentication
+    mcp_auth_token: password? # optional separate token for /mcp; empty = inherits auth_token
 
   evcc:
     enabled: bool

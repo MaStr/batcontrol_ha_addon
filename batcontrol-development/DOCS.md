@@ -197,6 +197,32 @@ Enables publishing of battery status and control messages via MQTT and integrate
 `auto_discover_topic`: homeassistant # base topic for Home Assistant discovery messages
 `grid_charge_lock_topic`: hems/batcontrol/grid_charge_lock # optional: absolute topic (not nested below `topic`) for an external HEMS/grid-operator grid-charge lock signal (section 14a EnWG), mirrors evcc's "External Limit". Payload `1`/`true` blocks charging from the grid immediately, `0`/`false` (default) restores the previous limit.
 
+### `api`:
+
+The read-only web dashboard, HTTP API and MCP server. In this add-on the dashboard is the
+**Batcontrol** entry in the Home Assistant sidebar; Home Assistant authenticates every request
+to it, so no port has to be published and no token is needed for normal use.
+
+Everything here is read-only. Nothing in the dashboard or the API can change the battery's
+behaviour - overrides stay on MQTT.
+
+`enabled`: true / false # serve the API, dashboard and MCP server (default: true - the sidebar panel needs it)
+`host`: 0.0.0.0 # bind address. **Leave this at 0.0.0.0**: ingress connects from the Home Assistant supervisor, so 127.0.0.1 makes the panel unreachable
+`port`: 8080 # must match the add-on's ingress port - change only if you know why
+`dashboard_enabled`: true / false # serve the dashboard itself (default: true)
+`docs_enabled`: true / false # serve the API documentation (Swagger UI) at `/docs` and the schema at `/openapi.json` (default: false)
+`mcp_enabled`: true / false # serve an MCP server at `/mcp` so an AI assistant can ask about the battery (default: false)
+`auth_token`: "" # optional bearer token for `/api/v1`. Only needed if you map port 8080 in the add-on's network settings - ingress is already authenticated
+`mcp_auth_token`: "" # optional separate token for `/mcp`, so an assistant can be given MCP access without the REST API. Empty means it inherits `auth_token`
+
+**Reaching it from outside Home Assistant** (another dashboard, a script, an MCP client): map
+port 8080 under the add-on's *Network* settings. That port bypasses Home Assistant's
+authentication, so set `auth_token` before you do.
+
+Full documentation: [REST API](https://mastr.github.io/batcontrol/integrations/rest-api/),
+[MCP server](https://mastr.github.io/batcontrol/integrations/mcp-server/) and
+[Dashboard](https://mastr.github.io/batcontrol/features/dashboard/).
+
 ### `evcc`:
 
 Allows integration with [evcc](https://docs.evcc.io/) to coordinate battery usage when charging an electric vehicle.
