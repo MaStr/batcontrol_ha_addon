@@ -29,7 +29,7 @@ RUN apk add --no-cache unzip && \
 #
 # Also pinned to the build host - the output is static files, so npm runs
 # once, natively, instead of once per architecture under QEMU.
-FROM --platform=$BUILDPLATFORM node:24-alpine AS frontend
+FROM --platform=$BUILDPLATFORM node:26-alpine AS frontend
 
 # Same layout as the repository, so vite's outDir resolves to
 # /build/src/batcontrol/web/static.
