@@ -7,7 +7,7 @@ ARG BUILD_VERSION
 # Pinned to the build host so the zip is downloaded and unpacked a single
 # time, not once per target architecture under emulation. Source files are
 # architecture independent.
-FROM --platform=$BUILDPLATFORM alpine:3.23 AS source
+FROM --platform=$BUILDPLATFORM alpine:3.24 AS source
 
 # Fetch the source code as zip from Github MaStr/batcontrol
 # https://github.com/MaStr/batcontrol/archive/refs/heads/main.zip
