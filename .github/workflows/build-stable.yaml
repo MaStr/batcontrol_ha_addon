@@ -49,10 +49,10 @@ jobs:
       build_matrix: ${{ steps.matrix.outputs.matrix }}
       image_name: ${{ steps.normalize.outputs.image_name }}
       registry_prefix: ${{ steps.normalize.outputs.registry_prefix }}
-      name: ${{ steps.info.outputs.name }}
-      description: ${{ steps.info.outputs.description }}
-      url: ${{ steps.info.outputs.url }}
-      version: ${{ steps.info.outputs.version }}
+      name: ${{ steps.normalize.outputs.name }}
+      description: ${{ steps.normalize.outputs.description }}
+      url: ${{ steps.normalize.outputs.url }}
+      version: ${{ steps.normalize.outputs.version }}
       publish: ${{ steps.publish.outputs.publish }}
     steps:
       - name: Check out the repository
@@ -66,20 +66,33 @@ jobs:
         with:
           path: "./${{ env.APP }}"
 
-      - name: Normalize image name
+      # The info helper returns JSON strings, i.e. values wrapped in double
+      # quotes (and "null" for missing keys). Strip them before use.
+      - name: Normalize app information
         id: normalize
         env:
           IMAGE: ${{ steps.info.outputs.image }}
           IMAGE_OVERRIDE: ${{ inputs.image_name }}
+          NAME: ${{ steps.info.outputs.name }}
+          DESCRIPTION: ${{ steps.info.outputs.description }}
+          URL: ${{ steps.info.outputs.url }}
+          VERSION: ${{ steps.info.outputs.version }}
         run: |
-          if [[ -z "${IMAGE}" || "${IMAGE}" == "null" ]]; then
+          image="${IMAGE//\"/}"
+          if [[ -z "${image}" || "${image}" == "null" ]]; then
             echo "::error::config.yaml has no image property"
             exit 1
           fi
-          prefix="${IMAGE%/*}"
-          name="${IMAGE##*/}"
-          echo "registry_prefix=${prefix}" >> "$GITHUB_OUTPUT"
-          echo "image_name=${IMAGE_OVERRIDE:-${name}}" >> "$GITHUB_OUTPUT"
+          url="${URL//\"/}"
+          [[ "${url}" == "null" ]] && url=""
+          {
+            echo "registry_prefix=${image%/*}"
+            echo "image_name=${IMAGE_OVERRIDE:-${image##*/}}"
+            echo "name=${NAME//\"/}"
+            echo "description=${DESCRIPTION//\"/}"
+            echo "url=${url}"
+            echo "version=${VERSION//\"/}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Decide whether to publish
         id: publish
