@@ -14,18 +14,37 @@ batcontrol/                   # STABLE add-on ("Batcontrol-next")
   DOCS.md                     # User-facing parameter docs shown in the HA UI
   CHANGELOG.md                # Shown in the HA UI on update
   translations/en.yaml        # Names/descriptions of option groups in the HA config UI
-  build.yaml                  # Base images per architecture
 batcontrol-development/       # DEVELOPMENT add-on ("Batcontrol-development")
+  build.yaml                  # Base images per architecture (built locally by the Supervisor)
 .github/workflows/lint.yaml   # frenck/action-addon-linter over every add-on dir
+.github/workflows/build-stable.yaml  # Prebuilt multi-arch image of the stable add-on -> ghcr.io
 
-# Both add-on directories contain the same set of files:
+# Both add-on directories contain the same set of files (build.yaml: development only):
 <addon>/config.yaml           # Add-on manifest: name/version/slug + options: + schema:
 <addon>/Dockerfile            # Image build; BUILD_VERSION is taken from config.yaml version
 <addon>/DOCS.md               # User-facing parameter docs shown in the HA UI
 <addon>/CHANGELOG.md          # Shown in the HA UI on update
 <addon>/translations/en.yaml  # Names/descriptions of option groups in the HA config UI
-<addon>/build.yaml            # Base images per architecture
 ```
+
+## Prebuilt image of the stable add-on
+
+`batcontrol/config.yaml` sets `image: ghcr.io/mastr/batcontrol_ha_addon/batcontrol`, so the
+Supervisor **pulls** `<image>:<version>` instead of building locally. The development add-on has
+no `image:` and is still built by the Supervisor on the user's machine.
+
+- `build-stable.yaml` builds amd64 + aarch64 on native runners with the
+  `home-assistant/builder` composite actions (the old `home-assistant/builder` action is retired)
+  and publishes a multi-arch manifest tagged `<version>` and `latest`. The base image is set in
+  the stable Dockerfile (`ARG BUILD_FROM=ghcr.io/home-assistant/base-python:...`); the new
+  actions do not read `build.yaml`.
+- PRs only build, pushes to `main` publish. An existing `<version>` tag is never overwritten
+  (`skip-existing`), so a Dockerfile change needs a `version` bump to reach users.
+- The Supervisor does **not** fall back to a local build when the pull fails: the image for a
+  new `version` must exist on ghcr.io before users see the update. All three packages
+  (`amd64-batcontrol`, `aarch64-batcontrol`, `batcontrol`) must be public.
+- To test from a branch: run the workflow via `workflow_dispatch` with `publish` and a test
+  `image_name` (e.g. `batcontrol-test`), so `batcontrol:latest` stays untouched.
 
 ## The two add-ons
 

@@ -1,0 +1,159 @@
+name: Build stable add-on image
+
+# Builds the prebuilt images of the stable add-on (batcontrol/) for amd64 and
+# aarch64 on native runners and publishes them to ghcr.io as a multi-arch
+# manifest tagged <version> and latest. The development add-on is not built
+# here, the Supervisor builds it locally.
+#
+# - pull_request: build only, nothing is pushed
+# - push to main: build and publish
+# - workflow_dispatch: build, optionally publish. Set image_name to publish
+#   under a different package (e.g. batcontrol-test) when testing a branch.
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "batcontrol/**"
+      - ".github/workflows/build-stable.yaml"
+  push:
+    branches:
+      - main
+    paths:
+      - "batcontrol/**"
+      - ".github/workflows/build-stable.yaml"
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Push the images to ghcr.io"
+        type: boolean
+        default: false
+      image_name:
+        description: "Override the package name (default: taken from config.yaml)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  APP: batcontrol
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-latest
+    outputs:
+      architectures: ${{ steps.info.outputs.architectures }}
+      build_matrix: ${{ steps.matrix.outputs.matrix }}
+      image_name: ${{ steps.normalize.outputs.image_name }}
+      registry_prefix: ${{ steps.normalize.outputs.registry_prefix }}
+      name: ${{ steps.info.outputs.name }}
+      description: ${{ steps.info.outputs.description }}
+      url: ${{ steps.info.outputs.url }}
+      version: ${{ steps.info.outputs.version }}
+      publish: ${{ steps.publish.outputs.publish }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Get app information
+        id: info
+        uses: home-assistant/actions/helpers/info@master
+        with:
+          path: "./${{ env.APP }}"
+
+      - name: Normalize image name
+        id: normalize
+        env:
+          IMAGE: ${{ steps.info.outputs.image }}
+          IMAGE_OVERRIDE: ${{ inputs.image_name }}
+        run: |
+          if [[ -z "${IMAGE}" || "${IMAGE}" == "null" ]]; then
+            echo "::error::config.yaml has no image property"
+            exit 1
+          fi
+          prefix="${IMAGE%/*}"
+          name="${IMAGE##*/}"
+          echo "registry_prefix=${prefix}" >> "$GITHUB_OUTPUT"
+          echo "image_name=${IMAGE_OVERRIDE:-${name}}" >> "$GITHUB_OUTPUT"
+
+      - name: Decide whether to publish
+        id: publish
+        env:
+          EVENT: ${{ github.event_name }}
+          DISPATCH_PUBLISH: ${{ inputs.publish }}
+        run: |
+          if [[ "${EVENT}" == "push" || "${DISPATCH_PUBLISH}" == "true" ]]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare build matrix
+        id: matrix
+        uses: home-assistant/builder/actions/prepare-multi-arch-matrix@2026.09.0
+        with:
+          architectures: ${{ steps.info.outputs.architectures }}
+          image-name: ${{ steps.normalize.outputs.image_name }}
+          registry-prefix: ${{ steps.normalize.outputs.registry_prefix }}
+
+  build:
+    name: Build ${{ matrix.arch }} image
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.prepare.outputs.build_matrix) }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        uses: home-assistant/builder/actions/build-image@2026.09.0
+        with:
+          arch: ${{ matrix.arch }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          context: "./${{ env.APP }}"
+          image: ${{ matrix.image }}
+          image-tags: |
+            ${{ needs.prepare.outputs.version }}
+            latest
+          labels: |
+            io.hass.type=app
+            io.hass.name=${{ needs.prepare.outputs.name }}
+            io.hass.description=${{ needs.prepare.outputs.description }}
+            ${{ needs.prepare.outputs.url && format('io.hass.url={0}', needs.prepare.outputs.url) || '' }}
+          push: ${{ needs.prepare.outputs.publish }}
+          skip-existing: ${{ needs.prepare.outputs.version }}
+          version: ${{ needs.prepare.outputs.version }}
+
+  manifest:
+    name: Publish multi-arch manifest
+    needs: [prepare, build]
+    if: needs.prepare.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      packages: write
+    steps:
+      - name: Publish multi-arch manifest
+        uses: home-assistant/builder/actions/publish-multi-arch-manifest@2026.09.0
+        with:
+          architectures: ${{ needs.prepare.outputs.architectures }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          image-name: ${{ needs.prepare.outputs.image_name }}
+          image-tags: |
+            ${{ needs.prepare.outputs.version }}
+            latest
+          registry-prefix: ${{ needs.prepare.outputs.registry_prefix }}
+          skip-existing: ${{ needs.prepare.outputs.version }}

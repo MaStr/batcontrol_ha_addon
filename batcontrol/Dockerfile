@@ -1,4 +1,6 @@
-ARG BUILD_FROM
+# Multi-arch Home Assistant base image (amd64 + arm64), see
+# https://github.com/home-assistant/docker-base
+ARG BUILD_FROM=ghcr.io/home-assistant/base-python:3.13-alpine3.23
 # Refers to the config.yaml
 ARG BUILD_VERSION
 FROM $BUILD_FROM AS builder
@@ -26,9 +28,10 @@ FROM $BUILD_FROM
 # Refers to the config.yaml
 ARG BUILD_VERSION
 LABEL VERSION="${BUILD_VERSION}"
-LABEL org.opencontainers.image.source = "https://github.com/MaStr/batcontrol_ha_addon"
-LABEL org.opencontainers.image.description="Alternate batcontrol add-on for Home Assistant"
-LABEL org.opencontainers.image.licenses=MIT
+LABEL org.opencontainers.image.title="Home Assistant App: Batcontrol-next" \
+      org.opencontainers.image.source="https://github.com/MaStr/batcontrol_ha_addon" \
+      org.opencontainers.image.description="Alternate batcontrol add-on for Home Assistant" \
+      org.opencontainers.image.licenses=MIT
 
 # Copy the built wheel from the builder stage and install it
 COPY --from=builder /wheels /wheels
@@ -46,7 +49,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --prefer-binary /wheels/*.whl
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
-ENV BATCONTROL_GIT_SHA=${GIT_SHA}
 ENV BATCONTROL_RUNTIME_ENV="home_assistant_addon-ng"
 
 # Set default timezone to UTC, override with -e TZ=Europe/Berlin or similar
