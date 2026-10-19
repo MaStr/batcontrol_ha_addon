@@ -38,7 +38,7 @@
 
 ### New Features
 
-- **A dashboard in the sidebar, and a read-only API behind it**: the add-on now has a
+- **A dashboard in the sidebar, and a read-only API behind it** (#457): the add-on now has a
   **Batcontrol** entry in the Home Assistant sidebar showing what batcontrol is doing and why -
   the current decision with its full trace, a hundred-cell state-of-charge grid in the style of
   the old defragmenter, and the price forecast with the cheapest and most expensive hours. It is
@@ -59,6 +59,25 @@
 
   See https://mastr.github.io/batcontrol-dev/features/dashboard/ and
   https://mastr.github.io/batcontrol-dev/integrations/rest-api/.
+
+- **Every MQTT value is also available via REST and MCP** (#464): some values - the effective
+  minimum grid charge SoC, the solar surplus, the peak shaving state and more - were only
+  computed when MQTT was enabled. They are now computed once per cycle and read alike by MQTT,
+  the REST API and the MCP server, so the API delivers the full picture with MQTT turned off.
+  New endpoints `/price/status` (24 h price statistics), `/solar`, `/peak-shaving`, `/inverters`
+  and `/inverter/{id}`, each with a matching MCP tool; `/battery` additionally reports the gross
+  capacity, the effective reservation and the always-allow-discharge limit in Wh, and `/config`
+  lists parameters changed at runtime (via MQTT, evcc or the grid charge lock) next to their
+  configured value. **Two new MQTT topics** with Home Assistant auto-discovery:
+  `gross_energy_capacity` and `reserved_energy_capacity_effective` - they show up as new
+  sensors on their own. The inverter SoC is now read once per cycle instead of up to four times.
+  See https://mastr.github.io/batcontrol-dev/integrations/rest-api/.
+
+- **New logo, also on the home screen** (#466): the add-on icon and logo are replaced by the
+  batcontrol bat battery - an upright battery with bat wings, neon green on black - the same
+  logo the dashboard uses. Adding the dashboard to a phone's home screen now shows that icon
+  instead of a plain "B" (apple-touch-icon and a web app manifest, both working under ingress).
+  The stable add-on gets the new icon and logo as well.
 
 - **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
   a structured *decision trace* for every control cycle - the ordered list of rules it evaluated,
@@ -150,6 +169,14 @@
   supported range to Python 3.11 - 3.14: Python 3.9 has been end of life since 2025-10-31 and
   3.10 reaches it on 2026-10-31. No configuration changes - `options:` and `schema:` are
   unaffected.
+
+- **Add-on image build restructured for the dashboard**: the Dockerfile now fetches the upstream
+  source once in a separate `alpine:3.24` stage and builds the dashboard in a dedicated
+  `node:26-alpine` stage. Both run natively on the build host instead of once per architecture
+  under emulation, which keeps the multi-arch build fast. The build fails if the wheel comes out
+  without the dashboard, rather than shipping an image that shows a hint page in the sidebar.
+  The image exposes port 8080 (unmapped by default) and ships the licenses of the fonts bundled
+  with the dashboard. Dependabot now tracks the pinned base images of the development add-on.
 
 - **Upstream reference config slimmed down** (#448): upstream trimmed the comments in
   `config/batcontrol_config_dummy.yaml` (359 -> 242 lines) and moved the explanations into the
