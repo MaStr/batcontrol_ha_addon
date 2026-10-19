@@ -76,8 +76,12 @@ PR references (`#NNN`).
 1. `python3 -c "import yaml,sys; yaml.safe_load(open(sys.argv[1]))" batcontrol/config.yaml`
 2. Every `options:` key has a `schema:` counterpart at the same path (and vice versa).
 3. `version` matches the upstream tag character for character.
-4. CI (`lint.yaml`) will run the HA add-on linter; optionally trigger `manual-build.yaml`
-   for add-on `batcontrol` to test the image build against the real release wheel.
+4. CI (`lint.yaml`) runs the HA add-on linter; `build-stable.yaml` builds both architectures
+   on the PR (no push) against the real release wheel.
+5. After merge, `build-stable.yaml` publishes `<version>` + `latest` to ghcr.io. Verify the run
+   is green and `docker buildx imagetools inspect ghcr.io/mastr/batcontrol_ha_addon/batcontrol:X.Y.Z`
+   lists amd64 and arm64 before announcing the update - the Supervisor does not fall back to a
+   local build if the pull fails.
 
 ## Part B — Open the next development cycle in `batcontrol-development/`
 
