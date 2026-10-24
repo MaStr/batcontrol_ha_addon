@@ -79,6 +79,25 @@
   instead of a plain "B" (apple-touch-icon and a web app manifest, both working under ingress).
   The stable add-on gets the new icon and logo as well.
 
+- **Forecasts and prices survive a restart** (#423): all solar forecast providers
+  and the API tariff providers (awattar, tibber, energyforecast, evcc) now save their latest raw
+  response to a shared data directory. After a restart, or an add-on update, batcontrol loads
+  that response and uses it as a fallback when the first refresh fails - for example because the
+  internet is not up yet or the provider rate-limits you. The original fetch time is kept, so
+  the normal 12-hour lifetime (`cache_ttl_hours` for the HomeAssistant solar provider) is never
+  extended by a restart. In the add-on the directory is `/data/data` inside Home Assistant's
+  persistent volume, passed to batcontrol via the new `--data-dir` option by the add-on
+  entrypoint. **No configuration change is needed** - `options:` and `schema:` are unaffected.
+  The cache contains raw provider responses, which may include installation or household data;
+  files are written with owner-only permissions. If you change a site's geometry, a forecast
+  sensor or your tariff account and the old response no longer fits, clear the cache: stop the
+  add-on and delete the `cache` folder inside the add-on's persistent data volume (the add-on
+  UI has no startup arguments, so batcontrol's `--clear-cache` flag is not reachable from it).
+  Forecast.Solar already used a restart cache next to the configuration file in an earlier
+  development build; it now uses the shared directory too. Local CSV load profiles and the
+  dynamic network fee fetcher are not cached. See
+  https://mastr.github.io/batcontrol-dev/getting-started/installation/#application-data-and-provider-caches.
+
 - **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
   a structured *decision trace* for every control cycle - the ordered list of rules it evaluated,
   each with a stable reason code, the numbers behind it, and which one was decisive - and
@@ -162,6 +181,13 @@
   itself was always correct, so the HA sensor and other consumers were never affected.
 
 ### Technical Updates
+
+- **Load profile generator in the documentation**: upstream added a browser-based tool that
+  turns a detailed Fronius Solar.web XLSX export into a `load_profile.csv` locally (optional
+  wallbox removal and smoothing, gap handling, plausibility checks, suggested
+  `annual_consumption`). Documentation only, no add-on change - the resulting file goes to
+  `/addon_configs/HEXCODE_batcontrol/load_profile.csv` as before. See the consumption forecast
+  page of the documentation.
 
 - **Python 3.14, minimum raised to 3.11** (#444): the add-on base image moves from
   `base-python:3.13-alpine3.23` to `base-python:3.14-alpine3.23` (Python 3.14.7), matching
