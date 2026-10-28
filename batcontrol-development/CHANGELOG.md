@@ -1,4 +1,8 @@
-# Release 0.10.0 - in Development
+# Release 0.10.1 - in Development
+
+## What's Changed
+
+# Release 0.10.0 - Released on 28.10.2026
 
 ## What's Changed
 
