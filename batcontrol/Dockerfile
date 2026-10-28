@@ -1,6 +1,6 @@
 # Multi-arch Home Assistant base image (amd64 + arm64), see
 # https://github.com/home-assistant/docker-base
-ARG BUILD_FROM=ghcr.io/home-assistant/base-python:3.13-alpine3.23
+ARG BUILD_FROM=ghcr.io/home-assistant/base-python:3.14-alpine3.23
 # Refers to the config.yaml
 ARG BUILD_VERSION
 FROM $BUILD_FROM AS builder
@@ -66,10 +66,16 @@ COPY --from=builder /batcontrol/config/load_profile_default.csv ./default_load_p
 
 COPY ../LICENSE  ./
 COPY --from=builder /batcontrol/entrypoint_ha.sh ./
+# Licenses of the fonts bundled with the dashboard (SIL OFL 1.1).
+COPY --from=builder /batcontrol/THIRD-PARTY-LICENSES.md ./
 COPY --from=builder /batcontrol/config ./config_template
 
 # Set the scripts as executable
 RUN chmod +x entrypoint_ha.sh
+
+# The read-only API, dashboard and MCP server. Reached through ingress; the
+# port is only published when the user maps it in the add-on configuration.
+EXPOSE 8080
 
 # COPY ./src/run_infinite.sh ./run_infinite.sh
 # CMD [ "./run_infinite.sh" ]

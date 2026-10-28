@@ -1,3 +1,280 @@
+# Release 0.10.0 - Released on 28.10.2026
+
+> **⚠️ Back up your configuration before updating.** This release renames options and removes
+> one, and the add-on does not start while it holds an option it no longer knows. Before you
+> update, open the add-on's *Configuration* tab, switch to *Edit in YAML* and save a copy of the
+> whole text (or take a Home Assistant backup of the add-on). Then rename `apikey`, `apitoken`
+> and `base_url` and remove `peak_shaving.mode` as described under *Breaking Changes*.
+
+## Impact Sentences
+
+What each change means for you, in one sentence each. Details follow below.
+
+### Breaking Changes
+
+- **One name per thing: `api_token` and `url`**: You must rename `apikey`, `apitoken` and `base_url` in your add-on configuration (before or right after updating), otherwise the add-on will not start; Docker, pip and hand-written configs keep working with a deprecation warning.
+- **`peak_shaving.mode` removed**: If your configuration still contains `peak_shaving.mode`, batcontrol now refuses to start and you must switch to `time_active` / `price_active`; the related MQTT topic and HA select entity disappear on their own.
+
+### New Features
+
+- **Dashboard in the sidebar and read-only API**: You get a new Batcontrol panel in Home Assistant that explains the current decision, enabled by default, and you only need to act if you want to turn it off or expose port 8080 (set `auth_token` first).
+- **Every MQTT value also via REST and MCP**: The API now delivers the full picture even with MQTT disabled, and two new sensors (`gross_energy_capacity`, `reserved_energy_capacity_effective`) appear automatically in Home Assistant, with no action needed.
+- **New logo**: The add-on and home-screen icon change to the new batcontrol bat battery, which is purely cosmetic.
+- **Forecasts and prices survive a restart**: After a restart or update, batcontrol can fall back on the last saved provider data if the first refresh fails, so you need no configuration change, but you should clear the cache if you change site geometry, forecast sensor or tariff account.
+- **New "Decision" sensor**: With MQTT enabled, a new auto-discovered sensor shows why batcontrol chose its current mode, and you do not need to configure anything.
+
+### Enhancements
+
+- **Solar forecast uses the matching `pvinstallations` entry**: A correctly filled second `pvinstallations` entry is no longer ignored, and a missing `api_token` or `entity_id` now produces a clear error naming the key.
+- **`cache_ttl_hours` works for the solar forecast**: If you set this option, it now actually takes effect, while the default of 12 hours stays the same for everyone else.
+- **Peak shaving works with every logic type**: If your add-on still has a leftover `peak_shaving.enabled: true`, it becomes active now, so check the startup log after updating and set it to `false` if you do not want it.
+
+### Bug Fixes
+
+- **Inverter outages are bounded, Modbus connections recover**: Outage handling is more reliable and Fronius Modbus connections recover better after timeouts, without any configuration change.
+- **Credentials no longer end up in the log**: Fronius digest headers and forecast.solar API keys are now masked in logs, so attaching `/data/batcontrol.log` to an issue is safer.
+- **Decision sensor: current numbers and clearer texts**: The Decision sensor now shows values that are at most 15 minutes old and reads more clearly, with nothing for you to do.
+- **15-minute resolution: four times too many HomeAssistant history requests**: If you use `homeassistant-api` with 15-minute resolution, startup is faster and Home Assistant is less loaded, while all other setups are unaffected.
+- **Telegraf/InfluxDB: full decision text**: If you feed MQTT into InfluxDB with the upstream sample config, you should adopt the updated `telegraf.sample.conf` so the full decision sentence is stored instead of a single word.
+
+### Technical Updates
+
+- **Load profile generator in the documentation**: There is a new optional browser tool to build a `load_profile.csv` from a Fronius Solar.web export, and nothing changes in the add-on itself.
+- **Python 3.14, minimum raised to 3.11**: The add-on moves to Python 3.14 under the hood, which requires no action from you.
+- **Add-on image build restructured for the dashboard**: The build is faster and now fails if the dashboard is missing, and port 8080 is exposed but not mapped by default, so you do not need to do anything.
+- **Upstream reference config slimmed down**: Only comments in the upstream example config were trimmed and no parameter changed, so the add-on is unaffected.
+- **ASCII art startup banner**: The log now shows a banner with the version at each startup, which makes restarts easy to spot.
+
+## What's Changed
+
+### Breaking Changes
+
+- **One name per thing: `api_token` and `url`** (#451): batcontrol used three spellings for a
+  credential (`apikey`, `apitoken`, `api`) and two for an endpoint (`url`, `base_url`),
+  depending on the section. A user who put a long-lived access token into `apikey` of a
+  HomeAssistant solar installation got no error - just `expected str at 'access_token'. Got None`
+  at startup, because the right value sat in the wrong key. From now on the credential is always
+  `api_token` and the endpoint is always `url`.
+
+  **What you have to do:** rename these options in your add-on configuration before updating,
+  or right after the update - the add-on does not start while an option it no longer knows is
+  stored:
+
+  | old option | new option | section |
+  |---|---|---|
+  | `apikey` | `api_token` | `utility`, `pvinstallations` |
+  | `apitoken` | `api_token` | `consumption_forecast` |
+  | `base_url` | `url` | `pvinstallations`, `consumption_forecast` |
+
+  batcontrol itself (Docker, pip, own `batcontrol_config.yaml`) still reads the old spellings and
+  logs a deprecation warning instead, so a hand-written configuration keeps working.
+  All `api_token` fields are now masked in the UI.
+
+- **`peak_shaving.mode` removed** (#443, completes #418): the deprecated `peak_shaving.mode`
+  parameter is no longer accepted - a configuration that still contains it is **rejected at
+  startup** with a migration hint, instead of being mapped onto the rule switches with a
+  deprecation warning as in 0.9.x. The option has been removed from the add-on's `options:` and
+  `schema:`, so it can no longer be set from the HA UI. Migration, if you still had it set:
+  `time` -> `time_active: true` + `price_active: false`, `price` -> `price_active: true` +
+  `time_active: false`, `combined` -> both `true`. The `peak_shaving/mode` MQTT topic and its
+  Home Assistant select entity are gone as well; the retained discovery config is cleared, so the
+  stale entity disappears from HA on its own. Runtime control via MQTT keeps `enabled`,
+  `allow_full_battery_after` and `price_limit`.
+
+### New Features
+
+- **A dashboard in the sidebar, and a read-only API behind it** (#457): the add-on now has a
+  **Batcontrol** entry in the Home Assistant sidebar showing what batcontrol is doing and why -
+  the current decision with its full trace, a hundred-cell state-of-charge grid in the style of
+  the old defragmenter, and the price forecast with the cheapest and most expensive hours. It is
+  served through ingress, so Home Assistant authenticates it and nothing has to be published.
+
+  Behind it sits a read-only HTTP API (`/api/v1`) with its own OpenAPI documentation, and
+  optionally an MCP server (`/mcp`) that lets an AI assistant answer questions like *"why is the
+  battery not discharging right now?"*. Both are **read-only by design**: there is no way to set
+  a mode, a charge rate or a parameter through them - overrides stay on MQTT, where Home
+  Assistant can gate them behind its own automations.
+
+  Configured under the new `api:` option block. It is **enabled by default** in this add-on,
+  because the sidebar panel needs it; set `enabled: false` to turn the whole thing off. Leave
+  `host` at `0.0.0.0` - ingress connects from the supervisor, and `127.0.0.1` makes the panel
+  unreachable. To reach the API from outside Home Assistant, map port 8080 in the add-on's
+  network settings and set `auth_token` first: a mapped port bypasses Home Assistant's
+  authentication.
+
+  See https://mastr.github.io/batcontrol-dev/features/dashboard/ and
+  https://mastr.github.io/batcontrol-dev/integrations/rest-api/.
+
+- **Every MQTT value is also available via REST and MCP** (#464): some values - the effective
+  minimum grid charge SoC, the solar surplus, the peak shaving state and more - were only
+  computed when MQTT was enabled. They are now computed once per cycle and read alike by MQTT,
+  the REST API and the MCP server, so the API delivers the full picture with MQTT turned off.
+  New endpoints `/price/status` (24 h price statistics), `/solar`, `/peak-shaving`, `/inverters`
+  and `/inverter/{id}`, each with a matching MCP tool; `/battery` additionally reports the gross
+  capacity, the effective reservation and the always-allow-discharge limit in Wh, and `/config`
+  lists parameters changed at runtime (via MQTT, evcc or the grid charge lock) next to their
+  configured value. **Two new MQTT topics** with Home Assistant auto-discovery:
+  `gross_energy_capacity` and `reserved_energy_capacity_effective` - they show up as new
+  sensors on their own. The inverter SoC is now read once per cycle instead of up to four times.
+  See https://mastr.github.io/batcontrol-dev/integrations/rest-api/.
+
+- **New logo, also on the home screen** (#466): the add-on icon and logo are replaced by the
+  batcontrol bat battery - an upright battery with bat wings, neon green on black - the same
+  logo the dashboard uses. Adding the dashboard to a phone's home screen now shows that icon
+  instead of a plain "B" (apple-touch-icon and a web app manifest, both working under ingress).
+  The stable add-on gets the new icon and logo as well.
+
+- **Forecasts and prices survive a restart** (#423): all solar forecast providers
+  and the API tariff providers (awattar, tibber, energyforecast, evcc) now save their latest raw
+  response to a shared data directory. After a restart, or an add-on update, batcontrol loads
+  that response and uses it as a fallback when the first refresh fails - for example because the
+  internet is not up yet or the provider rate-limits you. The original fetch time is kept, so
+  the normal 12-hour lifetime (`cache_ttl_hours` for the HomeAssistant solar provider) is never
+  extended by a restart. In the add-on the directory is `/data/data` inside Home Assistant's
+  persistent volume, passed to batcontrol via the new `--data-dir` option by the add-on
+  entrypoint. **No configuration change is needed** - `options:` and `schema:` are unaffected.
+  The cache contains raw provider responses, which may include installation or household data;
+  files are written with owner-only permissions. If you change a site's geometry, a forecast
+  sensor or your tariff account and the old response no longer fits, clear the cache: stop the
+  add-on and delete the `cache` folder inside the add-on's persistent data volume (the add-on
+  UI has no startup arguments, so batcontrol's `--clear-cache` flag is not reachable from it).
+  Forecast.Solar already used a restart cache next to the configuration file in an earlier
+  development build; it now uses the shared directory too. Local CSV load profiles and the
+  dynamic network fee fetcher are not cached. See
+  https://mastr.github.io/batcontrol-dev/getting-started/installation/#application-data-and-provider-caches.
+
+- **New Home Assistant "Decision" sensor - why did batcontrol do this?**: batcontrol now records
+  a structured *decision trace* for every control cycle - the ordered list of rules it evaluated,
+  each with a stable reason code, the numbers behind it, and which one was decisive - and
+  publishes it over MQTT as a new auto-discovered `Decision` sensor. The sensor state is the
+  resulting mode with its plain-language reason; the full trace is attached as sensor attributes,
+  so the HA UI or an automation can show *why* the battery is charging instead of only *that* it
+  is. The last 200 traces are kept in memory, and a new event is published on every mode change
+  or when the mode's value moves by 25% or more. Nothing to configure - the sensor appears
+  automatically when `mqtt` is enabled. See
+  https://mastr.github.io/batcontrol-dev/features/decision-sensor/ for how to read it.
+
+### Enhancements
+
+- **Solar forecast: the matching `pvinstallations` entry is used** (#451): batcontrol read the
+  connection details of the HomeAssistant Solar Forecast ML provider only from the *first*
+  `pvinstallations` entry, so a correctly filled second entry was silently ignored. It now picks
+  the entry with a matching `type`, or the one carrying `entity_id`. A missing `api_token` or
+  `entity_id` is reported as a configuration error naming the key, before any connection to
+  HomeAssistant is attempted.
+- **`cache_ttl_hours` works for the solar forecast** (#451): the option was documented for
+  `homeassistant-solar-forecast-ml` since it was introduced, but nothing ever read it - the cache
+  always ran with its default of 12 hours. It is now applied. The default is unchanged, so
+  existing setups behave exactly as before; the add-on comment and docs said 24.0 and were wrong.
+
+- **Peak shaving now works with every logic type** (#445): peak shaving and the solar-cap rule
+  moved from the `next` logic into the default logic, so there is a single code path.
+  `battery_control.type: next` keeps working unchanged - it is now a silent alias for `default`.
+  **Behavior change, please read if you use peak shaving:** up to 0.10.0 the peak shaving options
+  only took effect with `type: next` and were documented as having no effect otherwise. The add-on
+  UI exposes the `peak_shaving` options independently of the logic type, so an add-on
+  installation may well carry `peak_shaving.enabled: true` from a time when it did nothing - and
+  that setting now becomes active. batcontrol logs a one-time `Peak shaving is ENABLED ...` line
+  at startup so the activation is announced rather than silent; check the add-on log after
+  updating and set `peak_shaving.enabled: false` if you do not want it. Details:
+  https://mastr.github.io/batcontrol-dev/features/peak-shaving/
+
+### Bug Fixes
+
+- **Inverter outages are bounded, Modbus connections recover**: the outage window of the
+  resilient inverter wrapper (`outage_tolerance_minutes`) is now measured with a monotonic clock,
+  so clock synchronization or a manual change of the system time can no longer stretch or shorten
+  it. It is only cleared when every failed operation succeeds again - previously an unrelated
+  successful call (for example a local capacity lookup) could hide a persistent failed SoC read or
+  a failing write command, and the outage was never escalated. An accepted mode command supersedes
+  earlier failed mode commands, so a newly calculated decision recovers from a failed force-charge
+  without replaying the old command. A failure exactly at the limit is still tolerated; beyond it
+  batcontrol exits with an error. For `fronius-modbus`, an operation now makes at most one
+  reconnect and one retry after a socket timeout (5 s), connection error or remote close; if that
+  fails, the connection is closed and the next control cycle opens a new one. Modbus exception
+  responses are not retried. Relevant if you use the resilient wrapper (enabled by default) -
+  especially with a Fronius Modbus inverter. No configuration changes. See
+  https://mastr.github.io/batcontrol-dev/configuration/inverter-configuration/.
+
+- **Credentials no longer end up in the log** (#453, two code scanning findings of severity
+  "high"): the Fronius inverter's digest `Authorization` header - derived from the inverter
+  password and replayable for as long as the server nonce is valid - was written to the log in
+  clear text by the auth debug logger, and again through the `RuntimeError` raised for a failed
+  request. forecast.solar takes the API key as the first path segment of the request URL, so the
+  rate-limit and error branches logged response bodies and header dumps that echoed the key back.
+  Credential header values are now shortened to their first and last three characters (six
+  characters or less are masked completely), and the API key is replaced by that masked form in
+  everything logged from a forecast.solar response, which keeps the provider's own message
+  readable. The nonce, cnonce and nc values needed to debug digest auth are still logged in full.
+  Relevant for everyone who attaches `/data/batcontrol.log` to an issue; no configuration changes.
+
+- **Decision sensor: current numbers and clearer texts** (#450): the `Decision` sensor kept the
+  trace of the last *mode change*, so the numbers in its text (e.g. the usable energy behind
+  `Discharge Allowed`) could be hours old, and a new reason for the same mode never appeared at
+  all. The sensor is now also updated when the decisive reason changes, and otherwise refreshed
+  every 15 minutes, so its text is at most 15 minutes old. A refresh does not count as a status
+  change. The texts were reworked as well: `Avoid Discharge` now explains both why the battery is
+  held (usable energy vs. reserve) and why it is not topped up from the grid; a charge rate capped
+  by `max_grid_charge_rate` / `max_pv_charge_rate` / `min_pv_charge_rate` is appended in brackets
+  instead of replacing the actual reason; and the explanations for the always-allow level, peak
+  shaving (now naming the active rule), the solar feed-in limit, the safe-mode fallbacks, the
+  external unblock and the grid charge lock were reworded.
+  See https://mastr.github.io/batcontrol-dev/features/decision-sensor/
+
+- **15-minute resolution: four times too many HomeAssistant history requests** (#447, fixes #446):
+  with `time_resolution_minutes: 15` the consumption forecast horizon was handed to the providers
+  as hours although it was counted in slots, so the horizon was 4x too long and the
+  `homeassistant-api` consumption provider issued roughly four times the needed
+  `recorder/statistics_during_period` requests on a cold cache. The forecast values themselves were
+  correct - the only symptoms were avoidable load on HomeAssistant and a slower startup. The
+  request is now resolution-neutral, the slots already elapsed in the current hour are included so
+  the full horizon is really delivered, and the horizon is capped at 48 hours in all code paths.
+  Only relevant for `consumption_forecast.type: homeassistant-api`; CSV profiles are unaffected.
+
+- **Telegraf/InfluxDB: full decision text instead of a single word** (#449): for users who pipe the
+  batcontrol MQTT topics into InfluxDB with the upstream `config/telegraf.sample.conf`, the new
+  `/decision` topic was picked up by the catch-all `house/batcontrol/+` input, whose `value` parser
+  keeps only the last whitespace-separated token - `"Charge from Grid 1250 W - usable energy is
+  below the reserve"` arrived as `decision="reserve"`. The sample config now excludes the topic
+  from the catch-all and adds a dedicated consumer that stores the whole sentence as measurement
+  `batcontrol-decision`, plus a commented-out consumer for `/decision/attributes`. The MQTT payload
+  itself was always correct, so the HA sensor and other consumers were never affected.
+
+### Technical Updates
+
+- **Load profile generator in the documentation**: upstream added a browser-based tool that
+  turns a detailed Fronius Solar.web XLSX export into a `load_profile.csv` locally (optional
+  wallbox removal and smoothing, gap handling, plausibility checks, suggested
+  `annual_consumption`). Documentation only, no add-on change - the resulting file goes to
+  `/addon_configs/HEXCODE_batcontrol/load_profile.csv` as before. See the consumption forecast
+  page of the documentation.
+
+- **Python 3.14, minimum raised to 3.11** (#444): the add-on base image moves from
+  `base-python:3.13-alpine3.23` to `base-python:3.14-alpine3.23` (Python 3.14.7), matching
+  upstream batcontrol, whose Docker image now ships Python 3.14. Upstream also raised its
+  supported range to Python 3.11 - 3.14: Python 3.9 has been end of life since 2025-10-31 and
+  3.10 reaches it on 2026-10-31. No configuration changes - `options:` and `schema:` are
+  unaffected.
+
+- **Add-on image build restructured for the dashboard**: the Dockerfile now fetches the upstream
+  source once in a separate `alpine:3.24` stage and builds the dashboard in a dedicated
+  `node:26-alpine` stage. Both run natively on the build host instead of once per architecture
+  under emulation, which keeps the multi-arch build fast. The build fails if the wheel comes out
+  without the dashboard, rather than shipping an image that shows a hint page in the sidebar.
+  The image exposes port 8080 (unmapped by default) and ships the licenses of the fonts bundled
+  with the dashboard. Dependabot now tracks the pinned base images of the development add-on.
+
+- **Upstream reference config slimmed down** (#448): upstream trimmed the comments in
+  `config/batcontrol_config_dummy.yaml` (359 -> 242 lines) and moved the explanations into the
+  documentation. No parameter was added, removed or changed its value, so the add-on's `options:`
+  and `schema:` are untouched - the add-on takes its configuration from the HA UI, not from that
+  file. Listed only so the upstream change is traceable here.
+
+- **ASCII art startup banner** (#442): batcontrol logs an eyecatcher once at startup -
+  `BATCONTROL` in block letters, the catch phrase "riding your power prices" and the running
+  package version. Handy when scrolling the add-on log: it marks exactly where a restart happened
+  and which version came up.
+
 # Release 0.9.1 - Released on 06.10.2026
 
 ## What's Changed
