@@ -38,14 +38,9 @@ COPY --from=builder /wheels /wheels
 
 # Install runtime dependencies
 RUN apk add --no-cache \
-            python3 \
-            py3-pip \
-            py3-setuptools \
             tzdata
 
-COPY --from=builder /wheels /wheels
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Prefer piwheels for compatible wheels and fall back to PyPI
 RUN pip install --no-cache-dir --extra-index-url https://piwheels.org/simple --prefer-binary /wheels/*.whl
 
 ENV BATCONTROL_VERSION=${BUILD_VERSION}
