@@ -136,6 +136,21 @@
 
 ### Bug Fixes
 
+- **Inverter outages are bounded, Modbus connections recover**: the outage window of the
+  resilient inverter wrapper (`outage_tolerance_minutes`) is now measured with a monotonic clock,
+  so clock synchronization or a manual change of the system time can no longer stretch or shorten
+  it. It is only cleared when every failed operation succeeds again - previously an unrelated
+  successful call (for example a local capacity lookup) could hide a persistent failed SoC read or
+  a failing write command, and the outage was never escalated. An accepted mode command supersedes
+  earlier failed mode commands, so a newly calculated decision recovers from a failed force-charge
+  without replaying the old command. A failure exactly at the limit is still tolerated; beyond it
+  batcontrol exits with an error. For `fronius-modbus`, an operation now makes at most one
+  reconnect and one retry after a socket timeout (5 s), connection error or remote close; if that
+  fails, the connection is closed and the next control cycle opens a new one. Modbus exception
+  responses are not retried. Relevant if you use the resilient wrapper (enabled by default) -
+  especially with a Fronius Modbus inverter. No configuration changes. See
+  https://mastr.github.io/batcontrol-dev/configuration/inverter-configuration/.
+
 - **Credentials no longer end up in the log** (#453, two code scanning findings of severity
   "high"): the Fronius inverter's digest `Authorization` header - derived from the inverter
   password and replayable for as long as the server nonce is valid - was written to the log in
