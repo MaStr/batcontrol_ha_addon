@@ -7,7 +7,7 @@ This software helps you to get the additional energy at the cheapest price by co
 ## Customizing the load profile. (HA ADDON)
 
 Step 1
-download the default profile from https://raw.githubusercontent.com/MaStr/batcontrol/0.10.0/config/load_profile.csv
+download the default profile from https://raw.githubusercontent.com/MaStr/batcontrol/0.10.1/config/load_profile.csv
 or generate one from your own Fronius Solar.web export with the browser-based
 [load profile generator](https://mastr.github.io/batcontrol/configuration/consumption-forecast/).
 

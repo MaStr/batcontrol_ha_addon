@@ -1,3 +1,18 @@
+# Release 0.10.1 - Released on 29.10.2026
+
+## What's Changed
+
+### Bug Fixes
+
+- **HomeAssistant consumption forecast: no more fallback to "Allow Discharging"** (#476): the
+  consumption forecast from HomeAssistant covers at most 48 hours, while the price and solar
+  forecasts can reach further (about 52 hours in the logs). If the consumption forecast was more
+  than three slots short, batcontrol aborted the evaluation with `Not enough consumption forecast
+  data available, requested 210, got 191` and set the inverter to the default mode (Allow
+  Discharging) until the horizons matched again. A consumption forecast that is shorter than
+  requested now simply shortens the forecast horizon - exactly as it already did for prices and
+  solar. Only a completely empty consumption forecast is still an error.
+
 # Release 0.10.0 - Released on 28.10.2026
 
 > **⚠️ Back up your configuration before updating.** This release renames options and removes
