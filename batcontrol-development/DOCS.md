@@ -50,7 +50,7 @@ https://mastr.github.io/batcontrol-dev/
 `min_price_difference_rel:` 0.10 # (optional) minimum price difference as a fraction of the current price. Helps to avoid charging at high prices with less efficiency.
 
 `always_allow_discharge_limit`: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is allowed regardless of other parameters. This value can be set lower to 1.00 if you want to ensure that always some capacity remains available in case the sun starts shining more than forecasted.
-`max_charging_from_grid_limit`: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit. Above this limit only Solar Power may be used to increase the charge level.
+`max_charging_from_grid_limit`: 0.80 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit. Above this limit only Solar Power may be used to increase the charge level.
 `min_grid_charge_soc`: 0.55 # (optional) 0.00 to 1.00 SOC to preserve/charge before expensive slots.
 `grid_charge_target_strategy`: fixed # (optional) `fixed` uses `min_grid_charge_soc` unchanged, `forecast` keeps it as a reserve after expensive slots.
 `min_recharge_amount`: 100 # (optional) in Wh, start and minimum amount of energy to recharge the battery.

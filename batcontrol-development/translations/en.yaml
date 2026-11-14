@@ -13,7 +13,7 @@ configuration:
     description: Define the behaviour of the main algorithm.
     # min_price_difference: 0.05 # minimum price difference in Euro to justify charging your battery
     # always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
-    # max_charging_from_grid_limit: 0.90 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
+    # max_charging_from_grid_limit: 0.80 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
   inverter:
     name: Inverter
     description: Access data and type of your inverter. Currently only fronius_gen24 is supported.

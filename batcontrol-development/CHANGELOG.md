@@ -2,6 +2,82 @@
 
 ## What's Changed
 
+### Bug Fixes
+
+- **Price rule: negative free capacity counts as a full battery**: if the inverter reports a SoC
+  above `max_soc`, the free capacity becomes negative. Inside the cheap-price window the price
+  rule then returned a negative limit that was dropped as "no limit", so PV charging stayed
+  unrestricted although the battery was full. The free capacity is now floored at 0 and PV
+  charging is blocked (0 W), like the time rule does.
+
+- **Price rule: PV charge limit no longer too low inside the cheap window**: the free capacity
+  was divided by all cheap slots. It is now spread over the cheap slots that actually have a PV
+  surplus, the current slot counting with its remaining time.
+
+- **Grid recharge never exceeds the free capacity**: the minimum recharge amount
+  (`min_recharge_amount`) is now added before the cap to the free capacity, so the amount can no
+  longer exceed it by up to `min_recharge_amount`.
+
+- **Price based peak shaving compares prices again**: with prices given as a dict the rule
+  compared slot indices instead of prices.
+
+- **Peak shaving MQTT setters validate**: `enabled` and `allow_full_battery_after` now replace the
+  config object, so the validation runs.
+
+- **Control loop survives forecast gaps and logic errors**: a missing slot in the price,
+  production or consumption forecast is handled like a failed fetch instead of ending the
+  process. An exception in the logic is logged with its traceback and the cycle falls back to
+  allow discharging. Error messages for `time_resolution_minutes` and a missing/invalid timezone
+  are now readable.
+
+### Enhancements
+
+- **Grid charging is deferred only to slots that can deliver it**: on a price plateau (e.g.
+  static tariff zones) the whole demand used to be deferred to the last cheap slot; with
+  15-minute slots that slot was capped at `max_grid_charge_rate` and the expensive block started
+  with too little energy. Batcontrol now charges the part of the demand that the following
+  cheaper or equally cheap slots cannot deliver at that rate (decision reason
+  `GRID_RECHARGE_CHEAPER_SLOTS_INSUFFICIENT`).
+
+- **Discharge reserve for demand behind a too short cheaper slot** (#483): a single cheap
+  15-minute slot recharges only about 1.1 kWh at 5 kW, yet discharging was allowed although the
+  expensive block behind it could not be covered. The reserve now also contains the demand that
+  the cheaper slots cannot recharge, limited to the room left in the battery. The grid recharge
+  rule uses the same limit, so it no longer charges at the current price when later cheaper
+  slots would fill the battery anyway.
+
+- **PV charging below 500 W is blocked instead of raised to 500 W** (peak shaving, time and
+  price rule): with a small free capacity the 500 W minimum defeated the ramp (e.g. 2000 Wh free,
+  8 h to target: 55 W computed, battery full after 4 h). Such a limit is now applied as 0 W and
+  released once the computed value reaches 500 W. The `solar_cap` rule still raises to 500 W.
+
+- **Production window ends below 50 W**: the price and `solar_cap` rule ended the window only at
+  exactly 0 Wh, so tiny nightly values from a forecast provider extended it into the next day
+  and a cheap slot of tomorrow blocked PV charging today.
+
+- **`battery_control_expert` values are validated at startup**: an invalid value such as
+  `soften_price_difference_on_charging_factor: 0` now stops the start with an error naming key
+  and value instead of a `ZeroDivisionError` later. Boolean strings like `"false"` are parsed
+  correctly.
+
+### Configuration Changes
+
+- **Default `max_charging_from_grid_limit` is now `0.80`** (was `0.89` in the add-on defaults),
+  matching the upstream default and documentation. Existing installations keep their stored
+  value; only new installations and the documentation change.
+
+### Documentation
+
+- Upstream docs corrected after a logic review (default `max_charging_from_grid_limit`, slot
+  sizes, peak shaving, price difference calculation, `min_recharge_amount`, MQTT keys).
+
+### Technical Updates
+
+- **Python 3.15**: the Docker image of upstream batcontrol moves to `python:3.15-alpine`;
+  supported range is now Python 3.11 - 3.15.
+- Dashboard build tooling and runtime dependency bumps (vue, vite, vitest, jsdom, eslint,
+  swagger-ui-dist).
+
 # Release 0.10.1 - Released on 29.10.2026
 
 ## What's Changed
