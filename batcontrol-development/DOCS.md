@@ -105,6 +105,7 @@ https://mastr.github.io/batcontrol-dev/features/peak-shaving/
 `production_offset_percent`: 1.0 # adjust the production forecast (1.0 = 100%, 0.8 = 80%). Useful in winter when the panels are covered with snow.
 `preserve_min_grid_charge_soc`: false # if true, `min_grid_charge_soc` is also kept as reserved energy during cheap/pre-expensive slots
 `market_price_refresh_time`: "12:30" # (optional) UTC time "HH:MM" of a daily hard price refresh, to pick up newly published next-day prices (default: 12:30)
+`max_forecast_hours`: 0 # (optional) use at most this many hours of price and solar forecast, `0` = no limit (default: 0). Useful for providers with very long price forecasts (e.g. energyforecast.de, up to 96 h), where far-away prices are only a prediction.
 
 ### `inverter:`
 
