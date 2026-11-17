@@ -1,6 +1,24 @@
-# Release 0.10.2 - in Development
+# Release 0.11.0 - in Development
 
 ## What's Changed
+
+### Behaviour Changes
+
+- **SoC limits are real states of charge** (#493): `always_allow_discharge_limit`,
+  `max_charging_from_grid_limit` and `min_grid_charge_soc` used to be ratios of the capacity
+  reduced by the inverter's `max_soc`. They now refer to the capacity at 100 % SoC.
+  **Who is affected:** everyone with `max_soc` below 100 %. Nothing changes at `max_soc` 100 %.
+  **What you see:** with `max_soc` 95 % and a grid charge limit of 0.80 the battery used to stop
+  at 76 % SoC, now it stops at 80 %. **To keep the old stop points**, multiply your old values by
+  `max_soc` (0.80 x 0.95 = 0.76). A grid charge limit above `max_soc` ends at `max_soc`.
+
+- **`max_grid_charge_rate` is required** (#495): the value depends on your inverter, so there is
+  no default. A missing key used to crash at startup with `KeyError: 'max_charge_rate'`; now
+  batcontrol stops with an error that names the inverter (index and type), also with several
+  inverters. `0` or a negative value is rejected. The add-on schema marks the option as required
+  and accepts only values of at least 1 W. Installations that already have a value stored are
+  not affected. The old key `max_charge_rate` is still accepted in a hand-written
+  `batcontrol_config.yaml`.
 
 ### New Features
 
@@ -106,17 +124,12 @@
   requested value is now kept and the limit in effect is derived from it; MQTT and REST publish
   the limit in effect. A value above the discharge limit is accepted instead of dropped.
 
-- **SoC limits are real states of charge** (#493): `always_allow_discharge_limit`,
-  `max_charging_from_grid_limit` and `min_grid_charge_soc` were ratios of the capacity reduced by
-  the inverter's `max_soc`. With `max_soc` 95 % a grid charge limit of 0.80 stopped at 76 % SoC.
-  They now refer to the capacity at 100 % SoC, so the configured value no longer depends on
-  `max_soc`. A grid charge limit above `max_soc` ends at `max_soc`. Nothing changes at
-  `max_soc` 100 %.
-
 ### Configuration Changes
 
 - **New optional option `battery_control_expert.max_forecast_hours`** (default `0` = no limit),
   see above.
+- **`inverter.max_grid_charge_rate` is now required** and must be at least 1 W (#495), see
+  above.
 - **Default `max_charging_from_grid_limit` is now `0.80`** (was `0.89` in the add-on defaults),
   matching the upstream default and documentation. Existing installations keep their stored
   value; only new installations and the documentation change.

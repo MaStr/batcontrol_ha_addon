@@ -115,7 +115,7 @@ https://mastr.github.io/batcontrol-dev/features/peak-shaving/
 `password`: YOUR-PASSWORD # password for your inverter (fronius_gen24)
 `max_pv_charge_rate`: 0 # Watt. Limits the rate at which your PV System charges your battery. 0 = unlimited.
 `min_pv_charge_rate`: 0 # Watt. Lower limit for the PV charge rate in Mode 8 (peak shaving). 0 = no floor.
-`max_grid_charge_rate`: 5000 # Watt. Limits the maximum charging rate of your battery when charging from the grid.
+`max_grid_charge_rate`: 5000 # Watt, **required**. Limits the maximum charging rate of your battery when charging from the grid. There is no default - set the limit of your inverter. Must be greater than 0.
 `capacity`: 10000 # (optional) battery capacity in Wh. Required for `mqtt`, optional for `fronius_gen24` (overrides the DesignedCapacity)
 
 Fronius Gen24 only (optional): `fronius_inverter_id` (default `"1"`), `fronius_controller_id` (default `"0"`).

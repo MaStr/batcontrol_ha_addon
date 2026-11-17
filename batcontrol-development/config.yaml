@@ -1,6 +1,6 @@
 name: "Batcontrol-development"
 description: "(development) Controls the charging of the battery."
-version: "0.10.2dev4"
+version: "0.11.0dev4"
 slug: "batcontrol-development"
 init: false
 
@@ -232,7 +232,7 @@ schema:
     base_topic: str? #  (MQTT)  base topic, optional for mqtt (default: 'default')
     max_pv_charge_rate: float(0,)? # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     min_pv_charge_rate: float(0,)? # Watt, lower limit for PV charge rate in Mode 8 (peak shaving). 0 = no floor.
-    max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
+    max_grid_charge_rate: float(1,) # Watt, required for all inverter types, no default
     port: int(1,65535)? # (fronius-modbus) Modbus TCP port (default: 502)
     unit_id: int(1,)? # (fronius-modbus) Modbus unit ID (default: 1)
     revert_seconds: int(0,)? # (fronius-modbus) seconds before reverting to default mode (default: 0)
