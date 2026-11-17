@@ -12,11 +12,11 @@
   at 76 % SoC, now it stops at 80 %. **To keep the old stop points**, multiply your old values by
   `max_soc` (0.80 x 0.95 = 0.76). A grid charge limit above `max_soc` ends at `max_soc`.
 
-- **`max_grid_charge_rate` is required** (#495): the value depends on your inverter, so the
+- **`max_grid_charge_rate` is required** (#495, #498): the value depends on your inverter, so the
   option must be set. The add-on still pre-fills 5000 W as a suggestion - check that it matches
   your inverter. A missing key used to crash at startup with `KeyError: 'max_charge_rate'`; now
   batcontrol stops with an error that names the inverter (index and type), also with several
-  inverters. `0` or a negative value is rejected. The add-on schema marks the option as required
+  inverters. `0`, a negative value or a non-finite value (`.nan`, `.inf`) is rejected. The add-on schema marks the option as required
   and accepts only values of at least 1 W. Installations that already have a value stored are
   not affected. The old key `max_charge_rate` is still accepted in a hand-written
   `batcontrol_config.yaml`.
@@ -129,7 +129,7 @@
 
 - **New optional option `battery_control_expert.max_forecast_hours`** (default `0` = no limit),
   see above.
-- **`inverter.max_grid_charge_rate` is now required** and must be at least 1 W (#495), see
+- **`inverter.max_grid_charge_rate` is now required** and must be at least 1 W (#495, #498), see
   above.
 - **Default `max_charging_from_grid_limit` is now `0.80`** (was `0.89` in the add-on defaults),
   matching the upstream default and documentation. Existing installations keep their stored
