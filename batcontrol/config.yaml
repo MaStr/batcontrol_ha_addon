@@ -1,6 +1,6 @@
 name: "Batcontrol-next"
 description: "Controls the charging of the battery."
-version: "0.10.1"
+version: "0.11.0"
 slug: "batcontrol"
 init: false
 image: "ghcr.io/mastr/batcontrol_ha_addon/batcontrol"
@@ -42,7 +42,7 @@ options:
       0.10 # Percentage (in decimal) of the current price to justify charging your battery
       #    _rel helps to avoid charging at high prices with less efficiency
     always_allow_discharge_limit: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is always allowed
-    max_charging_from_grid_limit: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
+    max_charging_from_grid_limit: 0.80 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit
     # min_grid_charge_soc: 0.55        # optional 0.00 to 1.00 target to preserve/charge before expensive slots
     # grid_charge_target_strategy: fixed # fixed = use min_grid_charge_soc unchanged; forecast = keep it as reserve after expensive slots
     min_recharge_amount: 100 # in Wh, start & minimum amount of energy to recharge the battery
@@ -73,6 +73,7 @@ options:
     # market_price_refresh_time: "12:30" # UTC time for a daily hard price refresh.
     #   Use this to pick up newly published next-day prices (e.g. EPEX Spot ~12:00 UTC).
     #   Format: "HH:MM". Default: "12:30".
+    max_forecast_hours: 0 # use at most this many hours of forecast, 0 = no limit. Default: 0
 
   inverter:
     type: dummy #currently only fronius_gen24 supported
@@ -218,6 +219,7 @@ schema:
                                    # Useful for winter mode when solar panels are covered with snow
     preserve_min_grid_charge_soc: bool? # If true, also preserve min_grid_charge_soc as reserved energy during cheap/pre-expensive slots
     market_price_refresh_time: str? # UTC time "HH:MM" for a daily hard price refresh (default: "12:30")
+    max_forecast_hours: float(0,)? # use at most this many hours of forecast, 0 = no limit (default: 0)
   inverter:
     type: list(fronius_gen24|fronius-modbus|dummy|mqtt)
     address: str? # the local IP of your inverter. Required for fronius_gen24
@@ -230,7 +232,7 @@ schema:
     base_topic: str? #  (MQTT)  base topic, optional for mqtt (default: 'default')
     max_pv_charge_rate: float(0,)? # Watt, This allows to limit the PV to Battery charge rate. Set to 0 for unlimited charging.
     min_pv_charge_rate: float(0,)? # Watt, lower limit for PV charge rate in Mode 8 (peak shaving). 0 = no floor.
-    max_grid_charge_rate: float(0,)? # Watt, required for all inverter types
+    max_grid_charge_rate: float(1,) # Watt, required for all inverter types, 5000 is pre-filled as a suggestion
     port: int(1,65535)? # (fronius-modbus) Modbus TCP port (default: 502)
     unit_id: int(1,)? # (fronius-modbus) Modbus unit ID (default: 1)
     revert_seconds: int(0,)? # (fronius-modbus) seconds before reverting to default mode (default: 0)

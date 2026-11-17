@@ -7,7 +7,7 @@ This software helps you to get the additional energy at the cheapest price by co
 ## Customizing the load profile. (HA ADDON)
 
 Step 1
-download the default profile from https://raw.githubusercontent.com/MaStr/batcontrol/0.10.1/config/load_profile.csv
+download the default profile from https://raw.githubusercontent.com/MaStr/batcontrol/0.11.0/config/load_profile.csv
 or generate one from your own Fronius Solar.web export with the browser-based
 [load profile generator](https://mastr.github.io/batcontrol/configuration/consumption-forecast/).
 
@@ -47,7 +47,7 @@ https://mastr.github.io/batcontrol/
 `min_price_difference_rel:` 0.10 # (optional) minimum price difference as a fraction of the current price. Helps to avoid charging at high prices with less efficiency.
 
 `always_allow_discharge_limit`: 0.90 # 0.00 to 1.00 above this SOC limit using energy from the battery is allowed regardless of other parameters. This value can be set lower to 1.00 if you want to ensure that always some capacity remains available in case the sun starts shining more than forecasted.
-`max_charging_from_grid_limit`: 0.89 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit. Above this limit only Solar Power may be used to increase the charge level.
+`max_charging_from_grid_limit`: 0.80 # 0.00 to 1.00 charging from the grid is only allowed until this SOC limit. Above this limit only Solar Power may be used to increase the charge level.
 `min_grid_charge_soc`: 0.55 # (optional) 0.00 to 1.00 SOC to preserve/charge before expensive slots.
 `grid_charge_target_strategy`: fixed # (optional) `fixed` uses `min_grid_charge_soc` unchanged, `forecast` keeps it as a reserve after expensive slots.
 `min_recharge_amount`: 100 # (optional) in Wh, start and minimum amount of energy to recharge the battery.
@@ -102,6 +102,7 @@ https://mastr.github.io/batcontrol/features/peak-shaving/
 `production_offset_percent`: 1.0 # adjust the production forecast (1.0 = 100%, 0.8 = 80%). Useful in winter when the panels are covered with snow.
 `preserve_min_grid_charge_soc`: false # if true, `min_grid_charge_soc` is also kept as reserved energy during cheap/pre-expensive slots
 `market_price_refresh_time`: "12:30" # (optional) UTC time "HH:MM" of a daily hard price refresh, to pick up newly published next-day prices (default: 12:30)
+`max_forecast_hours`: 0 # (optional) use at most this many hours of price and solar forecast, `0` = no limit (default: 0). Useful for providers with very long price forecasts (e.g. energyforecast.de, up to 96 h), where far-away prices are only a prediction.
 
 ### `inverter:`
 
@@ -111,7 +112,7 @@ https://mastr.github.io/batcontrol/features/peak-shaving/
 `password`: YOUR-PASSWORD # password for your inverter (fronius_gen24)
 `max_pv_charge_rate`: 0 # Watt. Limits the rate at which your PV System charges your battery. 0 = unlimited.
 `min_pv_charge_rate`: 0 # Watt. Lower limit for the PV charge rate in Mode 8 (peak shaving). 0 = no floor.
-`max_grid_charge_rate`: 5000 # Watt. Limits the maximum charging rate of your battery when charging from the grid.
+`max_grid_charge_rate`: 5000 # Watt, **required**. Limits the maximum charging rate of your battery when charging from the grid. 5000 is pre-filled as a suggestion - adjust it to the limit of your inverter. Must be greater than 0.
 `capacity`: 10000 # (optional) battery capacity in Wh. Required for `mqtt`, optional for `fronius_gen24` (overrides the DesignedCapacity)
 
 Fronius Gen24 only (optional): `fronius_inverter_id` (default `"1"`), `fronius_controller_id` (default `"0"`).
