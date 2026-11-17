@@ -12,8 +12,9 @@
   at 76 % SoC, now it stops at 80 %. **To keep the old stop points**, multiply your old values by
   `max_soc` (0.80 x 0.95 = 0.76). A grid charge limit above `max_soc` ends at `max_soc`.
 
-- **`max_grid_charge_rate` is required** (#495): the value depends on your inverter, so there is
-  no default. A missing key used to crash at startup with `KeyError: 'max_charge_rate'`; now
+- **`max_grid_charge_rate` is required** (#495): the value depends on your inverter, so the
+  option must be set. The add-on still pre-fills 5000 W as a suggestion - check that it matches
+  your inverter. A missing key used to crash at startup with `KeyError: 'max_charge_rate'`; now
   batcontrol stops with an error that names the inverter (index and type), also with several
   inverters. `0` or a negative value is rejected. The add-on schema marks the option as required
   and accepts only values of at least 1 W. Installations that already have a value stored are
