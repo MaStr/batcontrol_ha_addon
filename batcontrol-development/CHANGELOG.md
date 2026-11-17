@@ -16,8 +16,8 @@
   option must be set. The add-on still pre-fills 5000 W as a suggestion - check that it matches
   your inverter. A missing key used to crash at startup with `KeyError: 'max_charge_rate'`; now
   batcontrol stops with an error that names the inverter (index and type), also with several
-  inverters. `0`, a negative value or a non-finite value (`.nan`, `.inf`) is rejected. The add-on schema marks the option as required
-  and accepts only values of at least 1 W. Installations that already have a value stored are
+  inverters. `0`, a negative value or a non-finite value (`.nan`, `.inf`) is rejected. The
+  add-on schema marks the option as required and accepts only values of at least 1 W. Installations that already have a value stored are
   not affected. The old key `max_charge_rate` is still accepted in a hand-written
   `batcontrol_config.yaml`.
 
