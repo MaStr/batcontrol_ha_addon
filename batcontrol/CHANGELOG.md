@@ -1,3 +1,152 @@
+# Release 0.11.0 - Released on 17.11.2026
+
+## What's Changed
+
+### Behaviour Changes
+
+- **SoC limits are real states of charge** (#493): `always_allow_discharge_limit`,
+  `max_charging_from_grid_limit` and `min_grid_charge_soc` used to be ratios of the capacity
+  reduced by the inverter's `max_soc`. They now refer to the capacity at 100 % SoC.
+  **Who is affected:** everyone with `max_soc` below 100 %. Nothing changes at `max_soc` 100 %.
+  **What you see:** with `max_soc` 95 % and a grid charge limit of 0.80 the battery used to stop
+  at 76 % SoC, now it stops at 80 %. **To keep the old stop points**, multiply your old values by
+  `max_soc` (0.80 x 0.95 = 0.76). A grid charge limit above `max_soc` ends at `max_soc`.
+
+- **`max_grid_charge_rate` is required** (#495, #498): the value depends on your inverter, so the
+  option must be set. The add-on still pre-fills 5000 W as a suggestion - check that it matches
+  your inverter. A missing key used to crash at startup with `KeyError: 'max_charge_rate'`; now
+  batcontrol stops with an error that names the inverter (index and type), also with several
+  inverters. `0`, a negative value or a non-finite value (`.nan`, `.inf`) is rejected. The
+  add-on schema marks the option as required and accepts only values of at least 1 W.
+  Installations that already have a value stored are not affected. The old key
+  `max_charge_rate` is still accepted in a hand-written `batcontrol_config.yaml`.
+
+### New Features
+
+- **`max_forecast_hours` limits the forecast horizon** (#494): providers such as
+  energyforecast.de predict prices for up to 96 hours, but prices beyond the day-ahead auction
+  are only a prediction and the solar forecast gets weaker every day, while the logic reserves
+  energy and charges from the grid for demand that is days away. `battery_control_expert.
+  max_forecast_hours` cuts the horizon so that logic, MQTT, REST API and dashboard end at the
+  same slot. Default `0` = unlimited; the limit is reported in `/api/v1/config`.
+
+### Bug Fixes
+
+- **Fronius: http -> https redirect no longer breaks the connection**: some Fronius firmware
+  occasionally redirects http requests to https. The redirect was followed and failed on the
+  inverter's self-signed certificate, so the request was retried three times with a 60 s pause
+  each and never succeeded. On a redirect to https batcontrol now switches to https for all
+  following requests and resends the same request without certificate verification. Other
+  redirects are not followed. No configuration change needed.
+
+- **Price rule: negative free capacity counts as a full battery**: if the inverter reports a SoC
+  above `max_soc`, the free capacity becomes negative. Inside the cheap-price window the price
+  rule then returned a negative limit that was dropped as "no limit", so PV charging stayed
+  unrestricted although the battery was full. The free capacity is now floored at 0 and PV
+  charging is blocked (0 W), like the time rule does.
+
+- **Price rule: PV charge limit no longer too low inside the cheap window**: the free capacity
+  was divided by all cheap slots. It is now spread over the cheap slots that actually have a PV
+  surplus, the current slot counting with its remaining time.
+
+- **Grid recharge never exceeds the free capacity**: the minimum recharge amount
+  (`min_recharge_amount`) is now added before the cap to the free capacity, so the amount can no
+  longer exceed it by up to `min_recharge_amount`.
+
+- **Price based peak shaving compares prices again**: with prices given as a dict the rule
+  compared slot indices instead of prices.
+
+- **Peak shaving MQTT setters validate**: `enabled` and `allow_full_battery_after` now replace the
+  config object, so the validation runs.
+
+- **Control loop survives forecast gaps and logic errors**: a missing slot in the price,
+  production or consumption forecast is handled like a failed fetch instead of ending the
+  process. An exception in the logic is logged with its traceback and the cycle falls back to
+  allow discharging. Error messages for `time_resolution_minutes` and a missing/invalid timezone
+  are now readable.
+
+### Enhancements
+
+- **Grid charging is deferred only to slots that can deliver it**: on a price plateau (e.g.
+  static tariff zones) the whole demand used to be deferred to the last cheap slot; with
+  15-minute slots that slot was capped at `max_grid_charge_rate` and the expensive block started
+  with too little energy. Batcontrol now charges the part of the demand that the following
+  cheaper or equally cheap slots cannot deliver at that rate (decision reason
+  `GRID_RECHARGE_CHEAPER_SLOTS_INSUFFICIENT`).
+
+- **Discharge reserve for demand behind a too short cheaper slot** (#483): a single cheap
+  15-minute slot recharges only about 1.1 kWh at 5 kW, yet discharging was allowed although the
+  expensive block behind it could not be covered. The reserve now also contains the demand that
+  the cheaper slots cannot recharge, limited to the room left in the battery. The grid recharge
+  rule uses the same limit, so it no longer charges at the current price when later cheaper
+  slots would fill the battery anyway.
+
+- **PV charging below 500 W is blocked instead of raised to 500 W** (peak shaving, time and
+  price rule): with a small free capacity the 500 W minimum defeated the ramp (e.g. 2000 Wh free,
+  8 h to target: 55 W computed, battery full after 4 h). Such a limit is now applied as 0 W and
+  released once the computed value reaches 500 W. The `solar_cap` rule still raises to 500 W.
+
+- **Grid charge window tolerates a marginally more expensive slot** (#490): with
+  `spread_grid_charge_over_charge_window` the charging window used to end at the first slot that
+  was more expensive than the current one, even by only 0.1 ct. On nearly flat price curves the
+  recalculated charge rate then jumped to `max_grid_charge_rate` for the rest of the block. The
+  window now also contains following slots that are at most the soften margin
+  (`min_price_difference / soften_price_difference_on_charging_factor`) more expensive than the
+  current slot. No new option; it only applies with `soften_price_difference_on_charging`
+  enabled, as before.
+
+- **Production window ends below 50 W**: the price and `solar_cap` rule ended the window only at
+  exactly 0 Wh, so tiny nightly values from a forecast provider extended it into the next day
+  and a cheap slot of tomorrow blocked PV charging today.
+
+- **`battery_control_expert` values are validated at startup**: an invalid value such as
+  `soften_price_difference_on_charging_factor: 0` now stops the start with an error naming key
+  and value instead of a `ZeroDivisionError` later. Boolean strings like `"false"` are parsed
+  correctly.
+
+- **Clearer explanation when the battery room limits the grid recharge**: the decision reason
+  `GRID_RECHARGE_CHEAPER_SLOTS_INSUFFICIENT` now also names the room left in the battery behind
+  the cheaper slots (`battery_room_behind_cheaper_slots`) when that room limits the amount, so the
+  numbers in the Decision sensor add up. The charge decisions themselves are unchanged.
+
+- **Peak shaving time rule plans with the PV forecast**: the counter-linear ramp towards
+  `allow_full_battery_after` spread the free capacity over the slots by time alone. With PV
+  already declining before the target hour the last slot delivered less than its share and the
+  battery was not full in time. A slot is now planned with no more than its forecast surplus;
+  the rest is moved to the other slots. With enough surplus in every slot the ramp is unchanged.
+
+- **One timestamp per control cycle**: core, logic and the providers read the clock separately,
+  so around a slot boundary slot 0 could mean different intervals for prices, forecasts and the
+  scaling of the elapsed time. Each cycle now uses a single timestamp. A naive datetime as
+  evaluation time is rejected.
+
+- **Grid charge limit stays as requested**: lowering `always_allow_discharge_limit` for a while
+  (MQTT) overwrote `max_charging_from_grid_limit` and left it lowered until restart. The
+  requested value is now kept and the limit in effect is derived from it; MQTT and REST publish
+  the limit in effect. A value above the discharge limit is accepted instead of dropped.
+
+### Configuration Changes
+
+- **New optional option `battery_control_expert.max_forecast_hours`** (default `0` = no limit),
+  see above.
+- **`inverter.max_grid_charge_rate` is now required** and must be at least 1 W (#495, #498), see
+  above.
+- **Default `max_charging_from_grid_limit` is now `0.80`** (was `0.89` in the add-on defaults),
+  matching the upstream default and documentation. Existing installations keep their stored
+  value; only new installations and the documentation change.
+
+### Documentation
+
+- Upstream docs corrected after a logic review (default `max_charging_from_grid_limit`, slot
+  sizes, peak shaving, price difference calculation, `min_recharge_amount`, MQTT keys).
+
+### Technical Updates
+
+- **Python 3.15**: the Docker image of upstream batcontrol moves to `python:3.15-alpine`;
+  supported range is now Python 3.11 - 3.15.
+- Dashboard build tooling and runtime dependency bumps (vue, vite, vitest, jsdom, eslint,
+  swagger-ui-dist).
+
 # Release 0.10.1 - Released on 29.10.2026
 
 ## What's Changed
