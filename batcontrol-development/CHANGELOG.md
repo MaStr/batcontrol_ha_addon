@@ -13,6 +13,13 @@
 
 ### Bug Fixes
 
+- **Fronius: http -> https redirect no longer breaks the connection**: some Fronius firmware
+  occasionally redirects http requests to https. The redirect was followed and failed on the
+  inverter's self-signed certificate, so the request was retried three times with a 60 s pause
+  each and never succeeded. On a redirect to https batcontrol now switches to https for all
+  following requests and resends the same request without certificate verification. Other
+  redirects are not followed. No configuration change needed.
+
 - **Price rule: negative free capacity counts as a full battery**: if the inverter reports a SoC
   above `max_soc`, the free capacity becomes negative. Inside the cheap-price window the price
   rule then returned a negative limit that was dropped as "no limit", so PV charging stayed
