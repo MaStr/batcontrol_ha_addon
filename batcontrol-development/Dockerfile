@@ -99,7 +99,6 @@ WORKDIR /app
 
 # The load profiles to all locations where it is needed
 COPY --from=source /batcontrol/config/load_profile_default.csv ./config/load_profile.csv
-COPY --from=source /batcontrol/config/load_profile_default.csv ./default_load_profile.csv
 
 COPY ../LICENSE  ./
 COPY --from=source /batcontrol/entrypoint_ha.sh ./
