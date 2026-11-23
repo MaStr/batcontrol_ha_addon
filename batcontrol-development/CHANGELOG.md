@@ -2,6 +2,59 @@
 
 ## What's Changed
 
+### Behaviour Changes
+
+- **Unreachable MQTT broker: retry, then stop with an error** (#505): if the broker could not be
+  reached at startup (e.g. the add-on starts before Mosquitto), batcontrol crashed with a
+  traceback on the first attempt - `retry_attempts` and `retry_delay` were never applied. Now the
+  connection is retried `retry_attempts` times (at least once) with `retry_delay` seconds in
+  between. If the broker stays unreachable or refuses the connection (wrong credentials, TLS),
+  batcontrol restores the inverter settings and exits with a clear error message, so Home
+  Assistant can restart the add-on. The evcc connection behaves the same with a fixed 5 attempts
+  10 s apart. `port`, `retry_attempts` and `retry_delay` must be whole numbers; invalid values
+  are rejected with an error naming the key.
+
+### New Features
+
+- **MQTT inverter: HA sensor for the charge limit** (#507): new diagnostic sensor "MQTT Inverter
+  N Command Limit Battery Charge Rate" for `command/limit_battery_charge_rate`. The MQTT
+  inverter docs now describe the `limit_battery_charge` mode (mode 8, used by peak shaving) and
+  its rate topic. **If you run your own MQTT inverter bridge:** handle `limit_battery_charge`,
+  otherwise the bridge stays in the previous mode and peak shaving has no effect.
+
+### Bug Fixes
+
+- **MQTT inverter: SoC updates resume after a broker reconnect** (#503): after a broker restart
+  or network drop the status topics were not subscribed again, so the inverter never received
+  SoC or capacity updates until batcontrol was restarted.
+
+- **MQTT inverter: a missing SoC no longer blocks every cycle for 3 minutes** (#506): batcontrol
+  now waits for the first SoC only during the first 180 s after start. Later a missing or stale
+  SoC skips the cycle at once; after `outage_tolerance_minutes` the outage handling applies. Set
+  `cache_ttl` above the publish interval of your bridge.
+
+- **Fronius: settings backups per inverter in the data directory** (#504): the original
+  time-of-use schedule and battery settings were backed up to shared files in `config/`. With
+  two Fronius inverters only the first one was backed up, and the second one kept batcontrol's
+  rules after shutdown. The backups are now stored per inverter in `/data/data/fronius/`. The old
+  `config/timeofuse_config.json` and `config/battery_config.json` are no longer read and can be
+  deleted. Two Fronius entries with the same address and an entry without address are rejected
+  at startup.
+
+- **MQTT: `peak_shaving/charge_limit` is published when peak shaving is off** (#508): the topic
+  was only updated while peak shaving was enabled, so after switching it off the HA entity kept
+  the last limit. It now sends `-1`, like the REST API.
+
+- **Fallback load profile works again** (#509): without a `load_profile` (or with an empty one)
+  the consumption forecast looked for a file that did not exist and batcontrol stopped with an
+  error. The fallback profile now ships inside the package. An empty `load_profile` is treated
+  like a missing one.
+
+### Technical Updates
+
+- Dashboard build tooling updated (vite, eslint, swagger-ui and others) (#502).
+- Add-on: removed the unused copy of `default_load_profile.csv` from the Dockerfile.
+
 # Release 0.11.0 - Released on 17.11.2026
 
 ## What's Changed
