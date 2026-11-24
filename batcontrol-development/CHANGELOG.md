@@ -50,6 +50,14 @@
   error. The fallback profile now ships inside the package. An empty `load_profile` is treated
   like a missing one.
 
+### Documentation
+
+- **Own `batcontrol_config.yaml`** (add-on docs): the add-on can run with a complete
+  configuration file in `/addon_configs/HEXCODE_batcontrol/batcontrol_config.yaml`. If that
+  file exists, **all settings in the add-on UI are ignored**. This behaviour existed before, but
+  was undocumented. The DOCS now describe it, including what to keep for the sidebar panel and
+  how to return to the UI options.
+
 ### Technical Updates
 
 - Dashboard build tooling updated (vite, eslint, swagger-ui and others) (#502).
