@@ -21,6 +21,42 @@ place the edited load profile in your home assistant instance using below path. 
 Step 4
 Restart the addon
 
+## Using your own batcontrol_config.yaml (advanced)
+
+Instead of the options in the add-on UI, the add-on can run with a complete
+batcontrol configuration file that you maintain yourself.
+
+**How it works:** at every start the add-on looks for
+`/addon_configs/HEXCODE_batcontrol/batcontrol_config.yaml`.
+
+- **File present:** batcontrol uses this file. **All settings in the add-on
+  UI are ignored**, and the UI gives no hint about it. Only the add-on log shows
+  `Using Config file found in addon config folder.`
+- **File absent:** batcontrol uses the options from the add-on UI, as usual.
+  The log shows `Config file batcontrol_config.yaml not found in addon config
+  folder. Proceeding with data from HA Addon configuration`.
+
+**When to use it:** for settings the add-on UI does not offer, or if you prefer
+to edit YAML.
+
+**Things to keep in mind:**
+
+- Home Assistant does not check this file. The range and type checks of the
+  add-on UI do not apply; batcontrol checks the values itself at startup
+  and logs warnings or stops with an error.
+- Start from the sample configuration of the matching batcontrol version:
+  https://github.com/MaStr/batcontrol/blob/main/config/batcontrol_config_dummy.yaml
+- For the **Batcontrol** sidebar panel, keep the `api` block as the add-on
+  sets it: `enabled: true`, `host: 0.0.0.0`, `port: 8080`.
+- The MQTT broker of the Mosquitto add-on is reachable as `core-mosquitto`.
+  TLS certificates are under `/ssl/`.
+- `load_profile` is a file name in the same folder, as described above.
+- New options in an add-on update do not reach your file automatically.
+  Compare it with the sample configuration after an update.
+
+**Going back to the add-on UI:** rename or delete the file and restart the
+add-on.
+
 ## Documentation
 
 The documentation of the underlying project provides further and up-to-date information about the project and its configuration parameters:
